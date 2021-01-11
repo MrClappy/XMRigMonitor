@@ -35,7 +35,6 @@ goto PULSE
 
 :SYSTEM_CRASH
 echo [%date% %time%] Script Triggered By System, Checking Network... >> C:\Users\Ryan\Desktop\xmrig-6.7.0\backend\logs\Script_log.txt
-type C:\Users\Ryan\Desktop\xmrig-6.7.0\backend\OpenHardwareMonitorReport\lasttemp.txt >> C:\Users\Ryan\Desktop\xmrig-6.7.0\backend\logs\Script_log.txt
 goto RECOVERY
 
 :RECOVERY
@@ -54,5 +53,6 @@ if errorlevel 1 (
 :SUCCESS
 
 echo [%date% %time%] XMRig Running, script monitoring... >> C:\Users\Ryan\Desktop\xmrig-6.7.0\backend\logs\Script_log.txt
+type C:\Users\Ryan\Desktop\xmrig-6.7.0\backend\OpenHardwareMonitorReport\lasttemp.txt >> C:\Users\Ryan\Desktop\xmrig-6.7.0\backend\logs\Script_log.txt
 CALL C:\Users\Ryan\Desktop\xmrig-6.7.0\backend\Crash.bat 2
 goto PULSE
