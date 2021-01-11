@@ -40,9 +40,13 @@ goto RECOVERY
 :RECOVERY
 ping -n 1 192.168.1.1 | find "TTL=" > nul
 if errorlevel 1 (
-    echo [%date% %time%] Network Still Down... >> C:\Users\Ryan\Desktop\xmrig-6.7.0\backend\logs\Script_log.txt
-    timeout /t 1 > nul    
-    goto RECOVERY
+    timeout /t 5 > nul
+    ping -n 1 192.168.1.1 | find "TTL=" > nul
+    if errorlevel 1 (
+        echo [%date% %time%] Network Still Down... >> C:\Users\Ryan\Desktop\xmrig-6.7.0\backend\logs\Script_log.txt    
+        goto RECOVERY
+    ) else ( goto RECOVERY
+    )
 ) else (
     echo [%date% %time%] Network Recovered >> C:\Users\Ryan\Desktop\xmrig-6.7.0\backend\logs\Script_log.txt
     FOR /F %%x IN ('tasklist /NH /FI "IMAGENAME eq %EXE%"') DO IF %%x == %EXE% goto PULSE
