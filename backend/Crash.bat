@@ -1,6 +1,6 @@
 @echo off
-SET GmailAccount=""
-SET "GmailPassword=""
+SET GmailAccount="xxx"
+SET "GmailPassword=xxx"
 SET PowerShellDir=C:\Windows\System32\WindowsPowerShell\v1.0
 CD /D "%PowerShellDir%"
 SET "param1=%~1"

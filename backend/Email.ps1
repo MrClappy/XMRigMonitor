@@ -3,7 +3,7 @@ $EmailPassword = $args[1]
 $Subject       = $args[2]
 
 $Username = $Username
-$EmailTo = "" 
+$EmailTo = "xxx" 
 $EmailFrom = "noreply@Whatever.notify"
 $Subject = $Subject
 $Body = Get-Content -Path C:\Users\Ryan\Desktop\xmrig-6.7.0\backend\logs\Script_log.txt | Out-String
