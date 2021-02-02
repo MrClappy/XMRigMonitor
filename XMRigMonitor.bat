@@ -9,7 +9,6 @@ set DailyLog=C:\Users\Ryan\Desktop\xmrig-6.7.0\backend\logs\Script_Log.txt
 
 echo. 2>%DailyLog%
 for %%I in (%DailyLog%) do set FileDate=%%~tI
-echo %FileDate%
 if not "%FileDate:~0,10%" == "%DATE:~-10%" copy %DailyLog% "C:\Users\Ryan\Desktop\xmrig-6.7.0\backend\logs\!FileDate:~0,2!.txt"
 
 if %username% == Ryan (echo [%date% %time%] Script Started Manually >> C:\Users\Ryan\Desktop\xmrig-6.7.0\backend\logs\Script_log.txt) else (goto SYSTEM_CRASH)
