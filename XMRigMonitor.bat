@@ -2,6 +2,8 @@
 SETLOCAL EnableExtensions
 set EXE=xmrig.exe
 set PULSETIME=10
+set XMRigCrashCount=C:\Users\Ryan\Desktop\xmrig-6.7.0\backend\XMRigCrashCount.txt
+set SystemCrashCount=C:\Users\Ryan\Desktop\xmrig-6.7.0\backend\SystemCrashCount.txt
 
 if %username% == Ryan (echo [%date% %time%] Script Started Manually >> C:\Users\Ryan\Desktop\xmrig-6.7.0\backend\logs\Script_log.txt) else (goto SYSTEM_CRASH)
 FOR /F %%x IN ('tasklist /NH /FI "IMAGENAME eq %EXE%"') DO IF %%x == %EXE% echo [%date% %time%] XMRig already running, script monitoring... >> C:\Users\Ryan\Desktop\xmrig-6.7.0\backend\logs\Script_log.txt && goto PULSE
@@ -28,13 +30,23 @@ timeout /t %PULSETIME% > nul
 goto PULSE
 
 :XMRIG_CRASH
-echo [%date% %time%] XMRig Crash Recovered, script monitoring... >> C:\Users\Ryan\Desktop\xmrig-6.7.0\backend\logs\Script_log.txt
+if not exist %XMRigCrashCount% >C:\Users\Ryan\Desktop\xmrig-6.7.0\backend\XMRigCrashCount.txt echo 0
+for %%I in (%XMRigCrashCount%) do set "FileDate=%%~tI"
+if not "%FileDate:~0,10%" == "%DATE:~-10%" del C:\Users\Ryan\Desktop\xmrig-6.7.0\backend\XMRigCrashCount.txt
+for /f " delims==" %%i in (C:\Users\Ryan\Desktop\xmrig-6.7.0\backend\XMRigCrashCount.txt) do set /A temp_counter= %%i+1 
+if %temp_counter% geq 0 echo %temp_counter% > C:\Users\Ryan\Desktop\xmrig-6.7.0\backend\XMRigCrashCount.txt
+echo [%date% %time%] XMRig Crash Recovered %temp_counter% times today, script monitoring... >> C:\Users\Ryan\Desktop\xmrig-6.7.0\backend\logs\Script_log.txt
 type C:\Users\Ryan\Desktop\xmrig-6.7.0\backend\OpenHardwareMonitorReport\lasttemp.txt >> C:\Users\Ryan\Desktop\xmrig-6.7.0\backend\logs\Script_log.txt
 CALL C:\Users\Ryan\Desktop\xmrig-6.7.0\backend\Crash.bat 1
 goto PULSE
 
 :SYSTEM_CRASH
-echo [%date% %time%] Script Triggered By System, Checking Network... >> C:\Users\Ryan\Desktop\xmrig-6.7.0\backend\logs\Script_log.txt
+if not exist %SystemCrashCount% >C:\Users\Ryan\Desktop\xmrig-6.7.0\backend\XMRigCrashCount.txt echo 0
+for %%I in (%SystemCrashCount%) do set "FileDate=%%~tI"
+if not "%FileDate:~0,10%" == "%DATE:~-10%" del C:\Users\Ryan\Desktop\xmrig-6.7.0\backend\SystemCrashCount.txt
+for /f " delims==" %%i in (C:\Users\Ryan\Desktop\xmrig-6.7.0\backend\SystemCrashCount.txt) do set /A temp_counter= %%i+1 
+if %temp_counter% geq 0 echo %temp_counter% > C:\Users\Ryan\Desktop\xmrig-6.7.0\backend\SystemCrashCount.txt
+echo [%date% %time%] System Crashed %temp_counter% times today, checking network... >> C:\Users\Ryan\Desktop\xmrig-6.7.0\backend\logs\Script_log.txt
 goto RECOVERY
 
 :RECOVERY
@@ -45,8 +57,7 @@ if errorlevel 1 (
     if errorlevel 1 (
         echo [%date% %time%] Network Still Down... >> C:\Users\Ryan\Desktop\xmrig-6.7.0\backend\logs\Script_log.txt    
         goto RECOVERY
-    ) else ( goto RECOVERY
-    )
+    ) else (goto RECOVERY)
 ) else (
     echo [%date% %time%] Network Recovered >> C:\Users\Ryan\Desktop\xmrig-6.7.0\backend\logs\Script_log.txt
     FOR /F %%x IN ('tasklist /NH /FI "IMAGENAME eq %EXE%"') DO IF %%x == %EXE% goto PULSE
