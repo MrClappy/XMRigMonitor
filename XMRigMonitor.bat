@@ -1,9 +1,16 @@
 @echo off
-SETLOCAL EnableExtensions
+setlocal EnableExtensions
+setlocal EnableDelayedExpansion
 set EXE=xmrig.exe
 set PULSETIME=10
 set XMRigCrashCount=C:\Users\Ryan\Desktop\xmrig-6.7.0\backend\XMRigCrashCount.txt
 set SystemCrashCount=C:\Users\Ryan\Desktop\xmrig-6.7.0\backend\SystemCrashCount.txt
+set DailyLog=C:\Users\Ryan\Desktop\xmrig-6.7.0\backend\logs\Script_Log.txt
+
+echo. 2>%DailyLog%
+for %%I in (%DailyLog%) do set FileDate=%%~tI
+echo %FileDate%
+if not "%FileDate:~0,10%" == "%DATE:~-10%" copy %DailyLog% "C:\Users\Ryan\Desktop\xmrig-6.7.0\backend\logs\!FileDate:~0,2!.txt"
 
 if %username% == Ryan (echo [%date% %time%] Script Started Manually >> C:\Users\Ryan\Desktop\xmrig-6.7.0\backend\logs\Script_log.txt) else (goto SYSTEM_CRASH)
 FOR /F %%x IN ('tasklist /NH /FI "IMAGENAME eq %EXE%"') DO IF %%x == %EXE% echo [%date% %time%] XMRig already running, script monitoring... >> C:\Users\Ryan\Desktop\xmrig-6.7.0\backend\logs\Script_log.txt && goto PULSE
