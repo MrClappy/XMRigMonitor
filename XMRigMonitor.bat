@@ -27,7 +27,8 @@ start %CPUTempPath%\OpenHardwareMonitorReport.exe ReportToFile -f %CPUTempPath%\
 for /f "tokens=2 delims=:" %%a in ('type %CPUTempPath%\temp\pull.txt^|find "/amdcpu/0/temperature/0"') do (
   echo %%a > %CPUTempPath%\temp\pulled.txt
 )
-for /f "tokens=3" %%a in (%CPUTempPath%\temp\pulled.txt) do set PulledTemp=%%a && echo [%date% %time%] Last CPU Temp: %PulledTemp%C > %CPUTempPath%\temp\lasttemp.txt
+for /f "tokens=3" %%a in (%CPUTempPath%\temp\pulled.txt) do set PulledTemp=%%a
+if %PulledTemp% gtr 0 echo [%date% %time%] Last CPU Temp: %PulledTemp%C > %CPUTempPath%\temp\lasttemp.txt
 del %CPUTempPath%\temp\pull.txt && del %CPUTempPath%\temp\pulled.txt
 cls && echo [%date% %time%] Still running...
 timeout /t %PulseTime% > nul
@@ -37,8 +38,8 @@ goto PULSE
 set CurrentDate=%DATE:~10,4%%DATE:~4,2%%DATE:~7,2%
 if not exist %XMRigCrashCount% del /F /Q %WorkingPath%\backend\temp\*.* & >%XMRigCrashCount% echo 0
 for /f " delims==" %%i in (%XMRigCrashCount%) do set /A TempCounter= %%i+1 
-if %TempCounter% geq 0 echo %TempCounter% > %XMRigCrashCount%
-echo [%date% %time%] XMRig Crash Recovered %TempCounter% times today, script monitoring... >> %DailyLog%
+if %TempCounter% gtr 0 echo %TempCounter% > %XMRigCrashCount%
+echo [%date% %time%] XMRig Crash Recovered %TempCounter% times, script monitoring... >> %DailyLog%
 type %CPUTempPath%\temp\lasttemp.txt >> %DailyLog%
 call %WorkingPath%\backend\Crash.bat 1
 goto PULSE
@@ -47,7 +48,7 @@ goto PULSE
 set CurrentDate=%DATE:~10,4%%DATE:~4,2%%DATE:~7,2%
 if not exist %SystemCrashCount% del %WorkingPath%\backend\temp\*.* & >%SystemCrashCount% echo 0
 for /f " delims==" %%i in (%SystemCrashCount%) do set /A TempCounter= %%i+1 
-if %TempCounter% geq 0 echo %TempCounter% > %XMRigCrashCount%
+if %TempCounter% gtr 0 echo %TempCounter% > %XMRigCrashCount%
 echo [%date% %time%] System Crashed %TempCounter% times today, checking network... >> %DailyLog%
 goto RECOVERY
 
