@@ -34,7 +34,7 @@ timeout /t %PulseTime% > nul
 goto PULSE
 
 :XMRIG_CRASH
-if not exist %XMRigCrashCount% del /F /Q %WorkingPath%\backend\temp\*.* && >%XMRigCrashCount% echo 0
+if not exist %XMRigCrashCount% del /F /Q %WorkingPath%\backend\temp\*.* & >%XMRigCrashCount% echo 0
 for /f " delims==" %%i in (%XMRigCrashCount%) do set /A TempCounter= %%i+1 
 if %TempCounter% geq 0 echo %TempCounter% > %XMRigCrashCount%
 echo [%date% %time%] XMRig Crash Recovered %TempCounter% times today, script monitoring... >> %DailyLog%
@@ -43,7 +43,7 @@ call %WorkingPath%\backend\Crash.bat 1
 goto PULSE
 
 :SYSTEM_CRASH
-if not exist %SystemCrashCount% del %WorkingPath%\backend\temp\*.* && >%SystemCrashCount% echo 0
+if not exist %SystemCrashCount% del %WorkingPath%\backend\temp\*.* & >%SystemCrashCount% echo 0
 for /f " delims==" %%i in (%SystemCrashCount%) do set /A TempCounter= %%i+1 
 if %TempCounter% geq 0 echo %TempCounter% > %XMRigCrashCount%
 echo [%date% %time%] System Crashed %TempCounter% times today, checking network... >> %DailyLog%
