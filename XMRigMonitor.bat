@@ -34,6 +34,7 @@ timeout /t %PulseTime% > nul
 goto PULSE
 
 :XMRIG_CRASH
+set CurrentDate=%DATE:~10,4%%DATE:~4,2%%DATE:~7,2%
 if not exist %XMRigCrashCount% del /F /Q %WorkingPath%\backend\temp\*.* & >%XMRigCrashCount% echo 0
 for /f " delims==" %%i in (%XMRigCrashCount%) do set /A TempCounter= %%i+1 
 if %TempCounter% geq 0 echo %TempCounter% > %XMRigCrashCount%
@@ -43,6 +44,7 @@ call %WorkingPath%\backend\Crash.bat 1
 goto PULSE
 
 :SYSTEM_CRASH
+set CurrentDate=%DATE:~10,4%%DATE:~4,2%%DATE:~7,2%
 if not exist %SystemCrashCount% del %WorkingPath%\backend\temp\*.* & >%SystemCrashCount% echo 0
 for /f " delims==" %%i in (%SystemCrashCount%) do set /A TempCounter= %%i+1 
 if %TempCounter% geq 0 echo %TempCounter% > %XMRigCrashCount%
@@ -59,10 +61,10 @@ if errorlevel 1 (
         goto RECOVERY
     ) else (goto RECOVERY)
 ) else (
-    echo [%date% %time%] Network Recovered >> %DailyLog%
-    for /F %%x in ('tasklist /NH /FI "IMAGENAME eq %EXE%"') do if %%x == %EXE% goto PULSE
-    start %WorkingPath%\xmrig.exe
-    for /F %%x in ('tasklist /NH /FI "IMAGENAME eq %EXE%"') do if %%x == %EXE% goto SUCCESS
+	echo [%date% %time%] Network Recovered >> %DailyLog%
+	for /F %%x in ('tasklist /NH /FI "IMAGENAME eq %EXE%"') do if %%x == %EXE% goto PULSE
+	start %WorkingPath%\xmrig.exe
+	for /F %%x in ('tasklist /NH /FI "IMAGENAME eq %EXE%"') do if %%x == %EXE% goto SUCCESS
 	)
 	
 :SUCCESS
