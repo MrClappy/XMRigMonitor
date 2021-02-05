@@ -1,9 +1,6 @@
 XMRig Monitor
 ====================
 
-Project Description
--------------------
-
 ### Project Intent & Current State
 
 XMRig Monitor is a personal project intended to serve as an automated watchdog for XMRig in Windows environments. Its primary purpose is to
