@@ -46,7 +46,7 @@ goto PULSE
 
 :SYSTEM_CRASH
 set CurrentDate=%DATE:~10,4%%DATE:~4,2%%DATE:~7,2%
-if not exist %SystemCrashCount% del %WorkingPath%\backend\temp\*.* & >%SystemCrashCount% echo 0
+if not exist %SystemCrashCount% del /F /Q %WorkingPath%\backend\temp\*.* & >%SystemCrashCount% echo 0
 for /f " delims==" %%i in (%SystemCrashCount%) do set /A TempCounter= %%i+1 
 if %TempCounter% gtr 0 echo %TempCounter% > %XMRigCrashCount%
 echo [%date% %time%] System Crashed %TempCounter% times today, checking network... >> %DailyLog%
