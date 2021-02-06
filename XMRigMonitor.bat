@@ -1,55 +1,67 @@
+REM XMRigMonitor 0.2b (https://github.com/MrClappy/XMRigMonitor)
+REM Ryan MacNeille 2021
 @echo off
-setlocal EnableExtensions
-setlocal EnableDelayedExpansion
+REM Configure Settings:
 set EXE=xmrig.exe
 set PulseTime=10
-set WorkingPath=C:\Users\Ryan\Desktop\xmrig-6.7.0
+set WorkingPath=C:\Users\Ryan\Desktop\xmrig-6.8.1
+
+REM -------------------
+title XMRigMonitor 0.2b
+mode 48,3
+echo.
+echo  Starting up...
+setlocal EnableExtensions
+setlocal EnableDelayedExpansion
+
 set CurrentDate=%DATE:~10,4%%DATE:~4,2%%DATE:~7,2%
-set XMRigCrashCount=%WorkingPath%\backend\temp\XMRigCrashCount_%CurrentDate%.txt
-set SystemCrashCount=%WorkingPath%\backend\temp\SystemCrashCount_%CurrentDate%.txt
 set DailyLog=%WorkingPath%\backend\logs\Script_Log_%CurrentDate%.txt
-set CPUTempPath=%WorkingPath%\backend\OpenHardwareMonitorReport
+set CPUTempPath=%WorkingPath%\backend\OHMR
+set XMRigCrashCount=%CPUTempPath%\temp\XMRigCrashCount_%CurrentDate%.rtf
+set SystemCrashCount=%CPUTempPath%\temp\SystemCrashCount_%CurrentDate%.txt
 
 :STARTUP
 if %username% == Ryan (echo [%date% %time%] Script Started Manually >> %DailyLog%) else (goto SYSTEM_CRASH)
 for /F %%x in ('tasklist /NH /FI "IMAGENAME eq %EXE%"') do if %%x == %EXE% echo [%date% %time%] XMRig already running, script monitoring... >> %DailyLog% && goto PULSE
-start %WorkingPath%\xmrig.exe
+start /MIN %WorkingPath%\xmrig.exe
 echo [%date% %time%] Initial XMRig Triggered, script monitoring... >> %DailyLog%
 
 :PULSE
 for /F %%x in ('tasklist /NH /FI "IMAGENAME eq %EXE%"') do if %%x == %EXE% goto FOUND
-start %WorkingPath%\xmrig.exe
+start /MIN %WorkingPath%\xmrig.exe
 for /F %%x in ('tasklist /NH /FI "IMAGENAME eq %EXE%"') do if %%x == %EXE% goto XMRIG_CRASH
 goto PULSE
 
 :FOUND
-start %CPUTempPath%\OpenHardwareMonitorReport.exe ReportToFile -f %CPUTempPath%\temp\pull.txt --IgnoreMonitorGPU --IgnoreMonitorHDD --IgnoreMonitorRAM --IgnoreMonitorFanController
-for /f "tokens=2 delims=:" %%a in ('type %CPUTempPath%\temp\pull.txt^|find "/amdcpu/0/temperature/0"') do (
-  echo %%a > %CPUTempPath%\temp\pulled.txt
+Start /WAIT /B %CPUTempPath%\OpenHardwareMonitorReport.exe ReportToFile -f %CPUTempPath%\temp\OHMR.tmp --IgnoreMonitorGPU --IgnoreMonitorHDD --IgnoreMonitorRAM --IgnoreMonitorFanController
+for /f "tokens=2 delims=:" %%a in ('type %CPUTempPath%\temp\OHMR.tmp^|find "/amdcpu/0/temperature/0"') do (
+  echo %%a > %CPUTempPath%\temp\ParsedTemp.tmp
 )
-for /f "tokens=3" %%a in (%CPUTempPath%\temp\pulled.txt) do set PulledTemp=%%a
-if %PulledTemp% gtr 0 echo [%date% %time%] Last CPU Temp: %PulledTemp%C > %CPUTempPath%\temp\lasttemp.txt
-del %CPUTempPath%\temp\pull.txt && del %CPUTempPath%\temp\pulled.txt
-cls && echo [%date% %time%] Still running...
+for /f "tokens=3" %%a in (%CPUTempPath%\temp\ParsedTemp.tmp) do set ParsedTemp=%%a
+if %ParsedTemp% gtr 0 echo [%date% %time%] Last CPU Temp: %ParsedTemp%C > %CPUTempPath%\temp\LastTemp.tmp
+del %CPUTempPath%\temp\OHMR.tmp && del %CPUTempPath%\temp\ParsedTemp.tmp
+cls && echo. && echo  [%date% %time%] Still running...
 timeout /t %PulseTime% > nul
 goto PULSE
 
 :XMRIG_CRASH
 set CurrentDate=%DATE:~10,4%%DATE:~4,2%%DATE:~7,2%
-if not exist %XMRigCrashCount% del /F /Q %WorkingPath%\backend\temp\*.* & >%XMRigCrashCount% echo 0
-for /f " delims==" %%i in (%XMRigCrashCount%) do set /A TempCounter= %%i+1 
-if %TempCounter% gtr 0 echo %TempCounter% > %XMRigCrashCount%
+if not exist %XMRigCrashCount% del /F /Q %CPUTempPath%\temp\*.rtf >nul & >%XMRigCrashCount% echo 0
+for /f " delims==" %%i in (%XMRigCrashCount%) do set /A TempCounter= %%i+1 >nul
+if %TempCounter% gtr 0 echo %TempCounter% > %XMRigCrashCount% >nul
+call %WorkingPath%\backend\LogCleaner.bat %DailyLog% >nul
 echo [%date% %time%] XMRig Crash Recovered %TempCounter% times, script monitoring... >> %DailyLog%
-type %CPUTempPath%\temp\lasttemp.txt >> %DailyLog%
-call %WorkingPath%\backend\Crash.bat 1
+type %CPUTempPath%\temp\LastTemp.tmp >> %DailyLog%
+call %WorkingPath%\backend\EmailConfig.bat 1
 goto PULSE
 
 :SYSTEM_CRASH
 set CurrentDate=%DATE:~10,4%%DATE:~4,2%%DATE:~7,2%
-if not exist %SystemCrashCount% del /F /Q %WorkingPath%\backend\temp\*.* & >%SystemCrashCount% echo 0
-for /f " delims==" %%i in (%SystemCrashCount%) do set /A TempCounter= %%i+1 
-if %TempCounter% gtr 0 echo %TempCounter% > %XMRigCrashCount%
-echo [%date% %time%] System Crashed %TempCounter% times today, checking network... >> %DailyLog%
+if not exist %SystemCrashCount% del /F /Q %CPUTempPath%\temp\*.txt >nul & >%SystemCrashCount% echo 0
+for /f " delims==" %%i in (%SystemCrashCount%) do set /A TempCounter= %%i+1  >nul
+if %TempCounter% gtr 0 echo %TempCounter% > %SystemCrashCount% >nul
+call %WorkingPath%\backend\LogCleaner.bat %DailyLog% >nul
+echo [%date% %time%] System Crashed %TempCounter% times, checking network... >> %DailyLog%
 goto RECOVERY
 
 :RECOVERY
@@ -64,12 +76,12 @@ if errorlevel 1 (
 ) else (
 	echo [%date% %time%] Network Recovered >> %DailyLog%
 	for /F %%x in ('tasklist /NH /FI "IMAGENAME eq %EXE%"') do if %%x == %EXE% goto PULSE
-	start %WorkingPath%\xmrig.exe
+	start /MIN %WorkingPath%\xmrig.exe
 	for /F %%x in ('tasklist /NH /FI "IMAGENAME eq %EXE%"') do if %%x == %EXE% goto SUCCESS
 	)
 	
 :SUCCESS
 echo [%date% %time%] XMRig Running, script monitoring... >> %DailyLog%
-type %CPUTempPath%\temp\lasttemp.txt >> %DailyLog%
-call %WorkingPath%\backend\Crash.bat 2
+type %CPUTempPath%\temp\LastTemp.tmp >> %DailyLog%
+call %WorkingPath%\backend\EmailConfig.bat 2
 goto PULSE
