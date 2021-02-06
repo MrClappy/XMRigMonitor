@@ -26,7 +26,10 @@ Subdirectories:
 Name            | Description
 --------------- | -------------------------------------------------
 Backend/		| Contains all supporting scripts and executables
-Backend/OpenHardwareMonitorReport		| Executables for CPU temperature monitoring
+Backend/OHMR		| Executables for CPU temperature monitoring
+Backend/OHMR/temp		| Temporary files for CPU temperature parsing & crash counters
+logs		| Rotating logs of daily events
+
 
 Particular files:
 
@@ -34,8 +37,10 @@ Name            | Description
 --------------- | ---------------------------------------------------------------
 README.md	| This file
 XMRigMonitor.bat		| Main project batch
-Crash.bat	| Supporting batch to configure email settings & notification types
-Email.ps1		| Email trigger script to grab log contents and send notifications
+EmailConfig.bat	| Supporting batch to configure email settings & notification types
+Emailer.ps1		| Email trigger script to grab log contents and send notifications
+LogCleaner.bat	| Supporting batch to strip leading & trailing spaces from log if system crashes during write
+
 
 Installation
 ------------
