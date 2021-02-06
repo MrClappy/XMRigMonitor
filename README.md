@@ -37,10 +37,9 @@ Name            | Description
 --------------- | ---------------------------------------------------------------
 README.md	| This file
 XMRigMonitor.bat		| Main project batch
+LogCleaner.bat	| Supporting batch to strip leading & trailing spaces from log if system crashes during write
 EmailConfig.bat	| Supporting batch to configure email settings & notification types
 Emailer.ps1		| Email trigger script to grab log contents and send notifications
-LogCleaner.bat	| Supporting batch to strip leading & trailing spaces from log if system crashes during write
-
 
 Installation
 ------------
