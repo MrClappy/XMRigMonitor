@@ -44,4 +44,4 @@ Emailer.ps1		| Email trigger script to grab log contents and send notifications
 Installation
 ------------
 
-Installation instructions will remain empty until a consistently stable status is reached.
+Installation instructions will remain empty until a consistently stable status is reached. Latest pre-release is [0.2b](https://github.com/MrClappy/XMRigMonitor/releases/tag/v0.2b)
