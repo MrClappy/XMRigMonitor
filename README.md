@@ -1,27 +1,26 @@
-XMRig Monitor
-====================
+# XMRig Monitor
 
-### Project Intent & Current State
+## Project Description & Current State
 
 XMRig Monitor is a personal project intended to serve as an automated watchdog for XMRig in Windows environments. Its primary purpose is to
 maintain XMRig uptime on unstable systems and provide event logs when optimizing hardware for mining.
 
-Primary features:
+### Primary features:
 
 - Restarts XMRig executable in the event of an application crash or system crash
 - Sends email notifications containing detailed logs of events
 - Monitors CPU temperature metrics to correlate crash root cause
 
-Current State:
+### Current State:
 
 The project currently exists as a set of Batch and Powershell scripts along with executables from the open-source project OpenHardwareMonitor
 (https://github.com/openhardwaremonitor/). Scripts are currently configured for and tested on my personal hardware and will require considerable
 manipulation to deploy elsewhere. I intend to continue using Batch to build out the logic for the project until it reaches a consistently stable
 point, then will port to either Python our PowerShell - I suspect the project will remain exclusively for Windows environments.
 
-### Files Description
+## Files Description
 
-Subdirectories:
+### Subdirectories:
 
 Name            | Description
 --------------- | -------------------------------------------------
@@ -31,7 +30,7 @@ Backend/OHMR/temp		| Temporary files for CPU temperature parsing & crash counter
 logs		| Rotating logs of daily events
 
 
-Particular files:
+### Particular files:
 
 Name            | Description
 --------------- | ---------------------------------------------------------------
@@ -41,7 +40,7 @@ LogCleaner.bat	| Supporting batch to strip leading & trailing spaces from log if
 EmailConfig.bat	| Supporting batch to configure email settings & notification types
 Emailer.ps1		| Email trigger script to grab log contents and send notifications
 
-Installation
+## Download & Installation
 ------------
 
-Installation instructions will remain empty until a consistently stable status is reached. Latest pre-release is [0.2b](https://github.com/MrClappy/XMRigMonitor/releases/tag/v0.2b)
+Installation instructions will remain empty until a consistently stable status is reached. Latest pre-release [(v0.2b)](https://github.com/MrClappy/XMRigMonitor/releases/tag/v0.2b) is availabile for download.
