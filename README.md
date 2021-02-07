@@ -10,7 +10,7 @@ maintain XMRig uptime on unstable systems and provide event logs when optimizing
 - Restarts XMRig executable in the event of an application crash or system crash
 - Sends email notifications containing detailed logs of events
 - Monitors CPU temperature metrics to correlate crash root cause
-- Runs in two modes: User Mode, which displays daily scrash statistics, or Scheduled Task Mode, which runs silently when computer is idle
+- User Mode = Displays daily crash statistics or Scheduled Task Mode = Runs silently when computer boots or is idle
 
 ### Current State:
 
