@@ -13,6 +13,7 @@ call :STARTUP
 @exit /B 0
 
 :LOAD_CONFIG
+	echo  Loading Configuration...
 	set ConfigFile=%1
 	set ConfigFile=%ConfigFile:"=%
 
@@ -20,7 +21,7 @@ call :STARTUP
 		"!ConfigFile!.conf"
 	) do (
 		if exist "%%c" (
-			for /F "usebackq delims=" %%v in (%%c) do (set %%v)
+			for /F "usebackq delims=" %%v in (%%c) do (set %%v 2>nul)
 		)
 	)
 
