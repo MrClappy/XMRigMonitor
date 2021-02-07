@@ -10,6 +10,7 @@ maintain XMRig uptime on unstable systems and provide event logs when optimizing
 - Restarts XMRig executable in the event of an application crash or system crash
 - Sends email notifications containing detailed logs of events
 - Monitors CPU temperature metrics to correlate crash root cause
+- Runs in two modes: User Mode, which displays daily scrash statistics, or Scheduled Task Mode, which runs silently when computer is idle
 
 ### Current State:
 
@@ -24,9 +25,9 @@ point, then will port to either Python our PowerShell - I suspect the project wi
 
 Name            | Description
 --------------- | -------------------------------------------------
-Backend/		| Contains all supporting scripts and executables
-Backend/OHMR		| Executables for CPU temperature monitoring
-Backend/OHMR/temp		| Temporary files for CPU temperature parsing & crash counters
+backend/		| Contains all supporting scripts and executables
+backend/OHMR		| Executables for CPU temperature monitoring
+backend/OHMR/temp		| Temporary files for CPU temperature parsing & crash counters
 logs		| Rotating logs of daily events
 
 
@@ -36,11 +37,18 @@ Name            | Description
 --------------- | ---------------------------------------------------------------
 README.md	| This file
 XMRigMonitor.bat		| Main project batch
-LogCleaner.bat	| Supporting batch to strip leading & trailing spaces from log if system crashes during write
-EmailConfig.bat	| Supporting batch to configure email settings & notification types
-Emailer.ps1		| Email trigger script to grab log contents and send notifications
+XMRigMonitor.conf		| User-configurable settings file
+backend/EmailConfig.bat	| Supporting batch to call email notification types
+backend/Emailer.ps1		| Email trigger script to grab log contents and send notifications
+backend/LogCleaner.bat	| Supporting batch to strip leading & trailing spaces from log if system crashes during write
+backend/ScheduledTask.xml		| Settings file for Windows Task Scheduler
 
 ## Download & Installation
 ------------
 
 Installation instructions will remain empty until a consistently stable status is reached. Latest pre-release [(v0.2b)](https://github.com/MrClappy/XMRigMonitor/releases/tag/v0.2b) is availabile for download.
+
+### Known Issues
+
+- CPU temperature monitoring only supports AMD CPUs currently
+- Scheduled Tasks have zero user-configurable parameters, adjustments must be made manually in Task Scheduler
