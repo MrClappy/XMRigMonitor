@@ -1,7 +1,7 @@
 @echo off
 setlocal EnableExtensions EnableDelayedExpansion
 title XMRigMonitor 0.2b
-mode 60,3
+:: mode 60,3
 :: batbox /h 0
 
 :: XMRigMonitor 0.2b (https://github.com/MrClappy/XMRigMonitor)
@@ -23,7 +23,7 @@ goto :STARTUP
 			for /F "usebackq delims=" %%v in (%%c) do (set %%v 2>nul)
 		)
 	)
-
+	
 	:: -------- Begin Program -------- ::
 :STARTUP
 	:: Set global variables
@@ -48,17 +48,20 @@ goto :STARTUP
 			>>"%XMLFile%" echo(!line:%OldVersion%=%NewVersion%!
 			endlocal
 		)
-		schtasks /Query /TN "XMRigMonitor" >nul
-		if %errorlevel% NEQ 0 (schtasks /Delete /TN "XMRigMonitor")
-		schtasks /Create /TN XMRigMonitor /XML %XMLFile%
+		schtasks /Query /TN "XMRigMonitor" 2>nul
+		if %errorlevel% NEQ 0 (schtasks /Delete /F /TN "XMRigMonitor" >nul)
+		schtasks /Create /TN XMRigMonitor /XML %XMLFile% >nul
 		for /f "delims=" %%i in ('type "%XMLFile%" ^& break ^> "%XMLFile%" ') do (
 			set "line=%%i"
 			setlocal enabledelayedexpansion
 			>>"%XMLFile%" echo(!line:%NewVersion%=%OldVersion%!
 			endlocal
 		)
+	) else (
+		schtasks /Query /TN "XMRigMonitor" 2>nul
+		if %errorlevel% EQU 0 (schtasks /Delete /F /TN "XMRigMonitor" 2>nul)
 	)
-	
+
 	:: Check if program was run by User or Scheduled Task
 	if not %username% == %Caller% (echo [%time%] [Note] Script Started Manually >> %DailyLog%) else (goto SYSTEM_CRASH)
 	
@@ -93,8 +96,8 @@ goto :STARTUP
 	set /p SystemCrashInt=<%SystemCrashCount%
 	if %XMRigCrashInt% gtr 0 set CrashOccurred=True
 	if %SystemCrashInt% gtr 0 set CrashOccured=True	
-	cls && echo. && echo  [%TIME:~0,2%:%TIME:~3,2%:%TIME:~6,2%] XMRig Running (Checking every %PulseTime%seconds)
-	if "%CrashOccurred%" == "True" cls && echo. && echo  [%TIME:~0,2%:%TIME:~3,2%:%TIME:~6,2%] XMRig Running (Checking every %PulseTime%seconds) && echo  Today: System Crashes = [%SystemCrashInt%] XMRig Crashes = [%XMRigCrashInt%]
+	echo. && echo  [%TIME:~0,2%:%TIME:~3,2%:%TIME:~6,2%] XMRig Running (Checking every %PulseTime%seconds)
+	if "%CrashOccurred%" == "True" echo. && echo  [%TIME:~0,2%:%TIME:~3,2%:%TIME:~6,2%] XMRig Running (Checking every %PulseTime%seconds) && echo  Today: System Crashes = [%SystemCrashInt%] XMRig Crashes = [%XMRigCrashInt%]
 	
 	:: Commands for button draw, however prompt doesn't refresh after this is called. Once button is pressed, prompt will refresh.
 	:: Call %WorkingDir%\button.bat  23 4 "Open Log" # Press
@@ -157,7 +160,7 @@ goto :STARTUP
 		)
 		
 :SUCCESS
-	:: After a system crash has been recovered, email the user (if configured) and continue monitoring
+	:: After a system crash has been recovered, email the user (if comfigured) and continue monitoring
 	echo [%time%] [Note] XMRig Running, script monitoring... >> %DailyLog%
 	if "%CPUMonitor%" == "Enabled" type %CPUTempPath%\temp\LastTemp.tmp >> %DailyLog%
 	if "%EmailOnSystemCrash%" == "True" call %WorkingDir%\backend\EmailConfig.bat 2 %EmailAccount% %EmailPassword% %EmailOnSystemCrashSubject% %DailyLog% %EmailRecipient% %SMTPServer% %SMTPPortNumber%
