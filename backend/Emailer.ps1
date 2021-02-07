@@ -1,16 +1,18 @@
 $Username      = $args[0]
 $EmailPassword = $args[1]
 $Subject       = $args[2]
+$LogFile       = $args[3]	
+$EmailTo       = $args[4]
+$SMTPServer    = $args[5]
+$SMTPPort      = $args[6]
 
-$Log = Get-ChildItem -Path C:\Users\Ryan\Desktop\xmrig-6.8.1\backend\logs | Sort-Object LastAccessTime -Descending | Select-Object -First 1
 $Username = $Username
-$EmailTo = "xxx@xxx.xxx" 
+ 
 $EmailFrom = "noreply@Whatever.notify"
 $Subject = $Subject
-$Body = Get-Content -Path C:\Users\Ryan\Desktop\xmrig-6.8.1\backend\logs\$Log | Out-String
-$SMTPServer = "smtp.gmail.com" 
+$Body = Get-Content -Path $LogFile | Out-String
 $SMTPMessage = New-Object System.Net.Mail.MailMessage($EmailFrom, $EmailTo, $Subject, $Body)
-$SMTPClient = New-Object Net.Mail.SmtpClient($SmtpServer, 587) 
+$SMTPClient = New-Object Net.Mail.SmtpClient($SMTPServer, $SMTPPort) 
 $SMTPClient.EnableSsl = $true 
 $SMTPClient.Credentials = New-Object System.Net.NetworkCredential($Username, $EmailPassword); 
 $SMTPClient.Send($SMTPMessage)
