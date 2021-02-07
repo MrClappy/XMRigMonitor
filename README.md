@@ -48,7 +48,7 @@ backend/ScheduledTask.xml		| Settings file for Windows Task Scheduler
 
 Installation instructions will remain empty until a consistently stable status is reached. Latest pre-release [(v0.2b)](https://github.com/MrClappy/XMRigMonitor/releases/tag/v0.2b) is availabile for download.
 
-## Configuration File Options
+## XMRigMonitor.conf Options
 ------------
 
 Setting            | Description             | Options
