@@ -2,7 +2,7 @@
 
 ## Project Description & Current State
 
-XMRig Monitor is a personal project intended to serve as an automated watchdog for XMRig in Windows environments. Its primary purpose is to
+XMRig Monitor is a personal project intended to serve as an automated watchdog for XMRig in Windows 10 environments. Its primary purpose is to
 maintain XMRig uptime on unstable systems and provide event logs when optimizing hardware for mining.
 
 ### Primary features:
@@ -17,7 +17,7 @@ maintain XMRig uptime on unstable systems and provide event logs when optimizing
 The project currently exists as a set of Batch and Powershell scripts along with executables from the open-source project OpenHardwareMonitor
 (https://github.com/openhardwaremonitor/). Scripts are currently configured for and tested on my personal hardware and will require considerable
 manipulation to deploy elsewhere. I intend to continue using Batch to build out the logic for the project until it reaches a consistently stable
-point, then will port to either Python our PowerShell - I suspect the project will remain exclusively for Windows environments.
+point, then will port to either Python our PowerShell - I suspect the project will remain exclusively for Windows 10 environments.
 
 ## Files Description
 
