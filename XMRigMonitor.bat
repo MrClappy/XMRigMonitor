@@ -1,7 +1,7 @@
 @echo off
 setlocal EnableExtensions EnableDelayedExpansion
 title XMRigMonitor 0.2b
-:: mode 60,3
+mode 60,3
 :: batbox /h 0
 
 :: XMRigMonitor 0.2b (https://github.com/MrClappy/XMRigMonitor)
@@ -96,8 +96,8 @@ goto :STARTUP
 	set /p SystemCrashInt=<%SystemCrashCount%
 	if %XMRigCrashInt% gtr 0 set CrashOccurred=True
 	if %SystemCrashInt% gtr 0 set CrashOccured=True	
-	echo. && echo  [%TIME:~0,2%:%TIME:~3,2%:%TIME:~6,2%] XMRig Running (Checking every %PulseTime%seconds)
-	if "%CrashOccurred%" == "True" echo. && echo  [%TIME:~0,2%:%TIME:~3,2%:%TIME:~6,2%] XMRig Running (Checking every %PulseTime%seconds) && echo  Today: System Crashes = [%SystemCrashInt%] XMRig Crashes = [%XMRigCrashInt%]
+	cls && echo. && echo  [%TIME:~0,2%:%TIME:~3,2%:%TIME:~6,2%] XMRig Running (Checking every %PulseTime%seconds)
+	if "%CrashOccurred%" == "True" cls && echo. && echo  [%TIME:~0,2%:%TIME:~3,2%:%TIME:~6,2%] XMRig Running (Checking every %PulseTime%seconds) && echo  Today: System Crashes = [%SystemCrashInt%] XMRig Crashes = [%XMRigCrashInt%]
 	
 	:: Commands for button draw, however prompt doesn't refresh after this is called. Once button is pressed, prompt will refresh.
 	:: Call %WorkingDir%\button.bat  23 4 "Open Log" # Press
