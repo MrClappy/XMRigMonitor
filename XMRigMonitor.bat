@@ -128,7 +128,7 @@ goto :STARTUP
 	call %WorkingDir%\backend\LogCleaner.bat %DailyLog%
 	echo [%time%] [Warn]   XMRig Crash Recovered %XMRigCrashInt% times, script monitoring... >> %DailyLog%
 	if "%CPUMonitor%" == "Enabled" type %CPUTempPath%\temp\LastTemp.tmp >> %DailyLog%
-	if "%EmailOnXMRigCrash%" == "True" call %WorkingDir%\backend\EmailConfig.bat 1 %EmailAccount% %EmailPassword% %EmailOnXMRigCrashSubject% %DailyLog% %EmailRecipient% %SMTPServer% %SMTPPortNumber%
+	if "%EmailOnXMRigCrash%" == "Enabled" call %WorkingDir%\backend\EmailConfig.bat 1 %EmailAccount% %EmailPassword% %EmailOnXMRigCrashSubject% %DailyLog% %EmailRecipient% %SMTPServer% %SMTPPortNumber%
 	goto PULSE
 
 :SYSTEM_CRASH
@@ -163,5 +163,5 @@ goto :STARTUP
 	:: After a system crash has been recovered, email the user (if comfigured) and continue monitoring
 	echo [%time%] [Note] XMRig Running, script monitoring... >> %DailyLog%
 	if "%CPUMonitor%" == "Enabled" type %CPUTempPath%\temp\LastTemp.tmp >> %DailyLog%
-	if "%EmailOnSystemCrash%" == "True" call %WorkingDir%\backend\EmailConfig.bat 2 %EmailAccount% %EmailPassword% %EmailOnSystemCrashSubject% %DailyLog% %EmailRecipient% %SMTPServer% %SMTPPortNumber%
+	if "%EmailOnSystemCrash%" == "Enabled" call %WorkingDir%\backend\EmailConfig.bat 2 %EmailAccount% %EmailPassword% %EmailOnSystemCrashSubject% %DailyLog% %EmailRecipient% %SMTPServer% %SMTPPortNumber%
 	goto PULSE
