@@ -55,16 +55,16 @@ Setting            | Description             | Options
 --------------- | ----------------- | ------------------------------
 PulseTime		| How often XMRigMonitor checks on XMRig  | Seconds (s)
 CPUMonitor		| Adds a CPU Temperature check every PulseTime | Enabled / Disabled
-ScheduledTask		| Creates a task to run XMRigMonitor on boot and idle state  | Enabled / Disabled
+ScheduledTask		| Creates a task to run on boot and idle state  | Enabled / Disabled
 EmailOnXMRigCrash | Sends an email when XMRig crashes | True / False
 EmailOnXMRigCrashSubject  | Subject line of the email when XMRig crashes | Text string in quotes
 EmailOnSystemCrash  | Sends an email when the system crashes  | True / False
 EmailOnSystemCrashSubject | Subject line of the email when the system crashes | Text string in quotes
-EmailAccount  | Email address used to send emails | Email address in plain text
-EmailPassword | Password of email address used to send emails  |  Password in plain text
-SMTPServer  | SMTP server address used to send emails | Server address in plain text
-SMTPPortNumber  | SMTP port number used to send emails  | Port number in plain text
-EmailRecipient  | Email address to receive emails | Email address in plain text
+EmailAccount  | Email address used to send emails | Email address
+EmailPassword | Password of email address used to send emails  |  Plain text password
+SMTPServer  | SMTP server address used to send emails | Server address
+SMTPPortNumber  | SMTP port number used to send emails  | Port number
+EmailRecipient  | Email address to receive emails | Email address
 
 
 ### Known Issues
