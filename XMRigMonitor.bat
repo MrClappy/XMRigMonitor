@@ -120,11 +120,8 @@ goto :STARTUP
 	
 	:: Wait for PulseTime seconds before continuing
 	timeout /t %PulseTime% >nul
-	if %CPUMonitor% == "Enabled" do (
-		goto CPU_TEMP
-	) else (
-		goto PULSE
-	)
+	if %CPUMonitor% == Enabled goto CPU_TEMP
+	goto PULSE
 
 :CPU_TEMP
 	:: As long as XMRig is running, get CPU temperature every PulseTime seconds	
