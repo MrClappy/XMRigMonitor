@@ -53,7 +53,7 @@ XMRigMonitor.bat as administrator.
 
 Setting            | Description             | Options
 --------------- | ----------------- | ------------------------------
-PulseTime		| How often XMRigMonitor checks on XMRig  | Seconds (s)
+PulseTime		| How often XMRigMonitor checks on XMRig  | Seconds
 CPUMonitor		| Adds a CPU Temperature check every PulseTime | Enabled / Disabled
 ScheduledTask		| Creates a task to run on boot and idle state  | Enabled / Disabled
 EmailOnXMRigCrash | Sends an email when XMRig crashes | True / False
