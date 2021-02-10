@@ -47,7 +47,7 @@ backend/ScheduledTask.xml		| Settings file for Windows Task Scheduler
 ------------
 The latest stable pre-release [(v0.2b)](https://github.com/MrClappy/XMRigMonitor/releases/tag/v0.2b) is availabile for download. The contents
 of the zip should be copied into the XMRig folder alongside the XMRig executable. Use XMRigMonitor.conf to set preferences then run 
-XMRigMonitor.bat as administrator. If ScheduledTask is enabled, it can only be removed manually in Task Scheduler.
+XMRigMonitor.bat as administrator.
 
 ### XMRigMonitor.conf Options
 
