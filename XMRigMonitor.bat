@@ -67,9 +67,11 @@ goto :STARTUP
 
 	:: Check if program was run by User or Scheduled Task
 	if not %username% == %Caller% (
+		set Caller=User
 		if "%ScheduledTaskChange%"=="" (
 			echo [%time%] [Note] Script Started Manually >> %DailyLog%
 		) else (
+			set Caller=Task
 			echo %ScheduledTaskChange% >> %DailyLog%
 		)
 	) else (
@@ -95,8 +97,13 @@ goto :STARTUP
 	for /F %%x in (
 		'tasklist /NH /FI "IMAGENAME eq %EXE%"'
 		) do (
-			if %%x == %EXE% goto STATS
+			if %%x == %EXE% (
+				if %Caller% == User (
+					goto STATS
+				)
 			)
+		)
+	)
 	start /MIN %WorkingDir%\%EXE%
 	for /F %%x in (
 		'tasklist /NH /FI "IMAGENAME eq %EXE%"'
@@ -134,6 +141,9 @@ goto :STARTUP
 	)
 	if %ParsedTemp% gtr 0 echo [%time%] [Note] Last CPU Temp: %ParsedTemp%C > %CPUTempPath%\temp\LastTemp.tmp
 	del %CPUTempPath%\temp\OHMR.tmp && del %CPUTempPath%\temp\ParsedTemp.tmp
+	if %TangoMode% == Enabled (
+		goto TANGO_MODE
+	)
 	goto PULSE
 
 :STATS
@@ -160,12 +170,14 @@ goto :STARTUP
 	)
 	if %CPUMonitor% == Disabled (
 		timeout /t %PulseTime% > nul
-		goto PULSE
-		) else (
-			set /a AdjustedPulseTime=%PulseTime%-5
-			timeout /t !AdjustedPulseTime! > nul
-			goto CPU_TEMP
+		if %TangoMode% == Enabled (
+			goto TANGO_MODE
 		)
+	) else (
+		set /a AdjustedPulseTime=%PulseTime%-5
+		timeout /t !AdjustedPulseTime! > nul
+		goto CPU_TEMP
+	)
 	
 :XMRIG_CRASH
 	:: Check to see if XMRig is crashing immediately, this can occur if the executable is corrupt
@@ -270,5 +282,24 @@ goto :STARTUP
 	)
 	if %EmailOnSystemCrash% == Enabled (
 		call %WorkingDir%\backend\EmailConfig.bat 2 %EmailAccount% "%EmailPassword%" %EmailOnSystemCrashSubject% %DailyLog% %EmailRecipient% %SMTPServer% %SMTPPortNumber%
+	)
+	goto PULSE
+	
+:TANGO_MODE
+
+	ping -n 1 %MinerName% | find "TTL=" > nul
+		if errorlevel 1 (
+			if /I not "%TangoMinerDown%" == "True" (
+				echo [%time%] [ Er ] Tango Mode miner %MinerName%failed to respond >> %DailyLog%
+				call %WorkingDir%\backend\EmailConfig.bat 3 %EmailAccount% "%EmailPassword%" %EmailOnTangoDownSubject% %DailyLog% %EmailRecipient% %SMTPServer% %SMTPPortNumber%
+				set TangoMinerDown=True
+			)
+		) else (
+			if "%TangoMinerDown%" == "True" (
+				echo [%time%] [ Er ] Tango Mode miner %MinerName%connectivity recovered >> %DailyLog%
+			)
+			set TangoMinerDown=False
+			goto PULSE
+		)
 	)
 	goto PULSE
