@@ -23,20 +23,21 @@ goto :STARTUP
 		)
 	)
 	
-	:: -------- Begin Program -------- ::
+	:: -- Begin Program -- ::
 :STARTUP
 	:: Set global variables
 	cd %~dp0
-	set WorkingDir=%cd%
 	set EXE=xmrig.exe
-	set "XMLFile=%WorkingDir%\backend\ScheduledTask.xml"
+	set WorkingDir=%cd%
+	set /a TooFastCrashInt=0
 	set "Caller=%computername%$"
-	set CurrentDate=%DATE:~10,4%%DATE:~4,2%%DATE:~7,2%
-	set DailyLog=%WorkingDir%\backend\logs\Script_Log_%CurrentDate%.txt
 	set CPUTempPath=%WorkingDir%\backend\OHMR
+	set CurrentDate=%DATE:~10,4%%DATE:~4,2%%DATE:~7,2%
+	set "XMLFile=%WorkingDir%\backend\ScheduledTask.xml"
+	set DailyLog=%WorkingDir%\backend\logs\Script_Log_%CurrentDate%.txt
 	set XMRigCrashCount=%CPUTempPath%\temp\XMRigCrashCount_%CurrentDate%.txt
 	set SystemCrashCount=%CPUTempPath%\temp\SystemCrashCount_%CurrentDate%.txt
-	
+
 	:: Check Scheduled Task Status
 	if %ScheduledTask% == Enabled (
 		for /f "delims=" %%i in ('type "%XMLFile%" ^& break ^> "%XMLFile%" ') do (
@@ -50,7 +51,7 @@ goto :STARTUP
 			schtasks /Create /TN XMRigMonitor /XML %XMLFile% > nul 2>&1
 		) else (
 			schtasks /Create /TN XMRigMonitor /XML %XMLFile% > nul 2>&1
-			echo [%time%] [Note] Scheduled Task Created >> %DailyLog%
+			set "ScheduledTaskChange=[%time%] [Note] Scheduled Task Enabled"
 		)
 		for /f "delims=" %%i in ('type "%XMLFile%" ^& break ^> "%XMLFile%" ') do (
 			set "line=%%i"
@@ -60,13 +61,17 @@ goto :STARTUP
 		schtasks /Query /TN "XMRigMonitor" > nul 2>&1
 		if !errorlevel! == 0 (
 			schtasks /Delete /F /TN "XMRigMonitor" > nul 2>&1
-			echo [%time%] [Note] Scheduled Task Deleted >> %DailyLog%
+			set "ScheduledTaskChange=[%time%] [Note] Scheduled Task Disabled"
 		)
 	)
-	
+
 	:: Check if program was run by User or Scheduled Task
 	if not %username% == %Caller% (
-		echo [%time%] [Note] Script Started Manually >> %DailyLog%
+		if "%ScheduledTaskChange%"=="" (
+			echo [%time%] [Note] Script Started Manually >> %DailyLog%
+		) else (
+			echo %ScheduledTaskChange% >> %DailyLog%
+		)
 	) else (
 		goto SYSTEM_CRASH
 		)
@@ -112,7 +117,7 @@ goto :STARTUP
 	)
 	if not exist %CPUTempPath%\temp\ParsedTemp.tmp (
 		set CPUMonitor=Disabled 
-		echo [%time%] [Error] Attempt to get CPU temperature failed, feature disabled >> %DailyLog%
+		echo [%time%] [ Er ] Attempt to get CPU temperature failed, feature disabled >> %DailyLog%
 		goto PULSE
 	)
 	for /f "tokens=3" %%a in (
@@ -121,7 +126,7 @@ goto :STARTUP
 			set "ParsedTemp=%%a"
 		)
 	)
-	if %ParsedTemp% gtr 0 echo [%date% %time%] Last CPU Temp: %ParsedTemp%C > %CPUTempPath%\temp\LastTemp.tmp
+	if %ParsedTemp% gtr 0 echo [%time%] [Note] Last CPU Temp: %ParsedTemp%C > %CPUTempPath%\temp\LastTemp.tmp
 	del %CPUTempPath%\temp\OHMR.tmp && del %CPUTempPath%\temp\ParsedTemp.tmp
 	goto PULSE
 
@@ -151,12 +156,32 @@ goto :STARTUP
 		timeout /t %PulseTime% > nul
 		goto PULSE
 		) else (
-			set /a AdjustedPulseTime=%PulseTime%-5"
+			set /a AdjustedPulseTime=%PulseTime%-5
 			timeout /t !AdjustedPulseTime! > nul
 			goto CPU_TEMP
 		)
 	
 :XMRIG_CRASH
+	:: Check to see if XMRig is crashing immediately, this can occur if the executable is corrupt
+	set "endTime=%time: =0%"
+	set "end=!endTime:%time:~8,1%=%%100)*100+1!"  &  set "start=!startTime:%time:~8,1%=%%100)*100+1!"
+	set /A "cc=elap%%100+100,elap/=100,ss=elap%%60+100,elap/=60,mm=elap%%60+100,hh=elap/60+100"
+	
+	if "%startTime%"=="" (
+		goto XMRIG_RECOVERY
+	) else (
+		if %ss:~1% lss 5 (
+		set /a TooFastCrashInt=%TooFastCrashInt%+1
+			if %TooFastCrashInt% geq 10 (
+				echo [%time%] [ Er ] XMRig is crashing too frequently. Exiting. >>%DailyLog%
+				exit
+			)
+		)
+	)
+	goto XMRIG_RECOVERY
+
+	
+:XMRIG_RECOVERY
 	:: When XMRig crashes, update the daily crash count and email the user (if configured)
 	set CurrentDate=%DATE:~10,4%%DATE:~4,2%%DATE:~7,2%
 	if not exist %XMRigCrashCount% (
@@ -181,6 +206,7 @@ goto :STARTUP
 	if %EmailOnXMRigCrash% == Enabled (
 		call %WorkingDir%\backend\EmailConfig.bat 1 %EmailAccount% "%EmailPassword%" %EmailOnXMRigCrashSubject% %DailyLog% %EmailRecipient% %SMTPServer% %SMTPPortNumber%
 	)
+	set "startTime=%time: =0%"
 	goto PULSE
 
 :SYSTEM_CRASH
@@ -202,9 +228,9 @@ goto :STARTUP
 	)
 	call %WorkingDir%\backend\LogCleaner.bat %DailyLog% >nul
 	echo [%time%] [Warn] System Crashed %SystemCrashInt% times, checking network... >> %DailyLog%
-	goto RECOVERY
+	goto SYSTEM_CRASH_RECOVERY
 
-:RECOVERY
+:SYSTEM_CRASH_RECOVERY
 	::Check to see if the system has internet connectivity and restart XMRig once confirmed
 	ping -n 1 192.168.1.1 | find "TTL=" > nul
 	if errorlevel 1 (
@@ -212,8 +238,8 @@ goto :STARTUP
 		ping -n 1 192.168.1.1 | find "TTL=" > nul
 		if errorlevel 1 (
 			echo [%time%] [Warn] Network Still Down... >> %DailyLog%    
-			goto RECOVERY
-		) else (goto RECOVERY)
+			goto SYSTEM_CRASH_RECOVERY
+		) else (goto SYSTEM_CRASH_RECOVERY)
 	) else (
 		echo [%time%] [Note] Network Recovered >> %DailyLog%
 		for /F %%x in (
