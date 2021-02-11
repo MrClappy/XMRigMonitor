@@ -40,7 +40,7 @@ XMRigMonitor.bat		| Main project batch
 XMRigMonitor.conf		| User-configurable settings file
 backend/EmailConfig.bat	| Supporting batch to call email notification types
 backend/Emailer.ps1		| Email trigger script to grab log contents and send notifications
-backend/LogCleaner.bat	| Supporting batch to strip leading & trailing spaces from log if system crashes during write
+backend/LogCleaner.bat	| Supporting batch to strip extra spaces from log if system crashes during write
 backend/ScheduledTask.xml		| Settings file for Windows Task Scheduler
 
 ## Releases & Setup
