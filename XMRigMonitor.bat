@@ -115,6 +115,12 @@ goto :STARTUP
 			echo %%a > %CPUTempPath%\temp\ParsedTemp.tmp
 		)
 	)
+	for /f "tokens=2 delims=:" %%a in (
+		'type %CPUTempPath%\temp\OHMR.tmp^|find "/intelcpu/0/temperature/0"'
+		) do (
+			echo %%a > %CPUTempPath%\temp\ParsedTemp.tmp
+		)
+	)
 	if not exist %CPUTempPath%\temp\ParsedTemp.tmp (
 		set CPUMonitor=Disabled 
 		echo [%time%] [ Er ] Attempt to get CPU temperature failed, feature disabled >> %DailyLog%
