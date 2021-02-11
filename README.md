@@ -60,11 +60,14 @@ EmailOnXMRigCrash | Sends an email when XMRig crashes | True / False
 EmailOnXMRigCrashSubject  | Subject line of the email when XMRig crashes | Text string in quotes
 EmailOnSystemCrash  | Sends an email when the system crashes  | True / False
 EmailOnSystemCrashSubject | Subject line of the email when the system crashes | Text string in quotes
+EmailOnTangoDownSubject | Subject line of the email when Tango miner disconnects | Text string in quotes
 EmailAccount  | Email address used to send emails | Email address
 EmailPassword | Password of email address used to send emails  |  Plain text password
 SMTPServer  | SMTP server address used to send emails | Server address
 SMTPPortNumber  | SMTP port number used to send emails  | Port number
 EmailRecipient  | Email address to receive emails | Email address
+TangoMode | Adds a connectivity check for a second miner | Enabled / Disabled
+MinerName | Sets the Tango Mode computer name to check | Computer Name
 
 
 ### Known Issues
