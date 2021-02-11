@@ -69,5 +69,4 @@ EmailRecipient  | Email address to receive emails | Email address
 
 ### Known Issues
 
-- CPU temperature monitoring only supports AMD CPUs currently
 - Scheduled Tasks have zero user-configurable parameters, adjustments must be made manually in Task Scheduler
