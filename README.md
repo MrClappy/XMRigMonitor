@@ -61,6 +61,7 @@ EmailOnXMRigCrashSubject  | Subject line of the email when XMRig crashes | Text 
 EmailOnSystemCrash  | Sends an email when the system crashes  | Enabled / Disabled
 EmailOnSystemCrashSubject | Subject line of the email when the system crashes | Text string in quotes
 EmailOnTangoDownSubject | Subject line of the email when Tango disconnects | Text string in quotes
+EmailOnTangoUpSubject | Subject line of the email when Tango recovers | Text string in quotes
 EmailAccount  | Email address used to send emails | Email address
 EmailPassword | Password of email address used to send emails  |  Plain text password
 SMTPServer  | SMTP server address used to send emails | Server address
