@@ -100,6 +100,8 @@ goto :STARTUP
 			if %%x == %EXE% (
 				if %Caller% == User (
 					goto STATS
+				) else (
+					goto FEATURE_CHECK
 				)
 			)
 		)
@@ -110,40 +112,6 @@ goto :STARTUP
 		) do (
 			if %%x == %EXE% goto XMRIG_CRASH
 			)
-	goto PULSE
-
-:CPU_TEMP
-	:: As long as XMRig is running, get CPU temperature every PulseTime seconds	
-	start /WAIT /B %CPUTempPath%\OpenHardwareMonitorReport.exe ReportToFile -f %CPUTempPath%\temp\OHMR.tmp
-	
-	for /f "tokens=2 delims=:" %%a in (
-		'type %CPUTempPath%\temp\OHMR.tmp^|find "/amdcpu/0/temperature/0"'
-		) do (
-			echo %%a > %CPUTempPath%\temp\ParsedTemp.tmp
-		)
-	)
-	for /f "tokens=2 delims=:" %%a in (
-		'type %CPUTempPath%\temp\OHMR.tmp^|find "/intelcpu/0/temperature/0"'
-		) do (
-			echo %%a > %CPUTempPath%\temp\ParsedTemp.tmp
-		)
-	)
-	if not exist %CPUTempPath%\temp\ParsedTemp.tmp (
-		set CPUMonitor=Disabled 
-		echo [%time%] [ Er ] Attempt to get CPU temperature failed, feature disabled >> %DailyLog%
-		goto PULSE
-	)
-	for /f "tokens=3" %%a in (
-		%CPUTempPath%\temp\ParsedTemp.tmp
-		) do (
-			set "ParsedTemp=%%a"
-		)
-	)
-	if %ParsedTemp% gtr 0 echo [%time%] [Note] Last CPU Temp: %ParsedTemp%C > %CPUTempPath%\temp\LastTemp.tmp
-	del %CPUTempPath%\temp\OHMR.tmp && del %CPUTempPath%\temp\ParsedTemp.tmp
-	if %TangoMode% == Enabled (
-		goto TANGO_MODE
-	)
 	goto PULSE
 
 :STATS
@@ -168,16 +136,23 @@ goto :STARTUP
 		mode 58,5 && cls && echo.
 		echo  [%TIME:~0,2%:%TIME:~3,2%:%TIME:~6,2%] XMRig Running (Checking every %PulseTime%seconds) && echo  Today: System Crashes = [%SystemCrashInt%] XMRig Crashes = [%XMRigCrashInt%]
 	)
-	if %CPUMonitor% == Disabled (
-		timeout /t %PulseTime% > nul
-		if %TangoMode% == Enabled (
-			goto TANGO_MODE
-		)
-	) else (
+	goto FEATURE_CHECK
+	
+:FEATURE_CHECK
+	:: Check and run any enabled feature
+	if %CPUMonitor% == Enabled (
 		set /a AdjustedPulseTime=%PulseTime%-5
 		timeout /t !AdjustedPulseTime! > nul
-		goto CPU_TEMP
+		call :CPU_TEMP
+	) else (
+		timeout /t %PulseTime% > nul
 	)
+	
+	if %TangoMode% == Enabled (
+		call :TANGO_MODE
+	)
+	goto PULSE
+	
 	
 :XMRIG_CRASH
 	:: Check to see if XMRig is crashing immediately, this can occur if the executable is corrupt
@@ -222,7 +197,7 @@ goto :STARTUP
 		type %CPUTempPath%\temp\LastTemp.tmp >> %DailyLog%
 	)
 	if %EmailOnXMRigCrash% == Enabled (
-		call %WorkingDir%\backend\EmailConfig.bat 1 %EmailAccount% "%EmailPassword%" %EmailOnXMRigCrashSubject% %DailyLog% %EmailRecipient% %SMTPServer% %SMTPPortNumber%
+		call %WorkingDir%\backend\EmailConfig.bat %EmailAccount% "%EmailPassword%" %EmailOnXMRigCrashSubject% %DailyLog% %EmailRecipient% %SMTPServer% %SMTPPortNumber%
 	)
 	set "startTime=%time: =0%"
 	goto PULSE
@@ -281,7 +256,7 @@ goto :STARTUP
 		type %CPUTempPath%\temp\LastTemp.tmp >> %DailyLog%
 	)
 	if %EmailOnSystemCrash% == Enabled (
-		call %WorkingDir%\backend\EmailConfig.bat 2 %EmailAccount% "%EmailPassword%" %EmailOnSystemCrashSubject% %DailyLog% %EmailRecipient% %SMTPServer% %SMTPPortNumber%
+		call %WorkingDir%\backend\EmailConfig.bat %EmailAccount% "%EmailPassword%" %EmailOnSystemCrashSubject% %DailyLog% %EmailRecipient% %SMTPServer% %SMTPPortNumber%
 	)
 	goto PULSE
 	
@@ -291,15 +266,46 @@ goto :STARTUP
 		if errorlevel 1 (
 			if /I not "%TangoMinerDown%" == "True" (
 				echo [%time%] [ Er ] Tango Mode miner %MinerName%failed to respond >> %DailyLog%
-				call %WorkingDir%\backend\EmailConfig.bat 3 %EmailAccount% "%EmailPassword%" %EmailOnTangoDownSubject% %DailyLog% %EmailRecipient% %SMTPServer% %SMTPPortNumber%
+				call %WorkingDir%\backend\EmailConfig.bat %EmailAccount% "%EmailPassword%" %EmailOnTangoDownSubject% %DailyLog% %EmailRecipient% %SMTPServer% %SMTPPortNumber%
 				set TangoMinerDown=True
 			)
 		) else (
 			if "%TangoMinerDown%" == "True" (
 				echo [%time%] [ Er ] Tango Mode miner %MinerName%connectivity recovered >> %DailyLog%
+				call %WorkingDir%\backend\EmailConfig.bat %EmailAccount% "%EmailPassword%" %EmailOnTangoUpSubject% %DailyLog% %EmailRecipient% %SMTPServer% %SMTPPortNumber%
 			)
 			set TangoMinerDown=False
 			goto PULSE
 		)
 	)
 	goto PULSE
+	
+:CPU_TEMP
+	:: As long as XMRig is running, get CPU temperature every PulseTime seconds	
+	start /WAIT /B %CPUTempPath%\OpenHardwareMonitorReport.exe ReportToFile -f %CPUTempPath%\temp\OHMR.tmp
+	
+	for /f "tokens=2 delims=:" %%a in (
+		'type %CPUTempPath%\temp\OHMR.tmp^|find "/amdcpu/0/temperature/0"'
+		) do (
+			echo %%a > %CPUTempPath%\temp\ParsedTemp.tmp
+		)
+	)
+	for /f "tokens=2 delims=:" %%a in (
+		'type %CPUTempPath%\temp\OHMR.tmp^|find "/intelcpu/0/temperature/0"'
+		) do (
+			echo %%a > %CPUTempPath%\temp\ParsedTemp.tmp
+		)
+	)
+	if not exist %CPUTempPath%\temp\ParsedTemp.tmp (
+		set CPUMonitor=Disabled 
+		echo [%time%] [ Er ] Attempt to get CPU temperature failed, feature disabled >> %DailyLog%
+		goto PULSE
+	)
+	for /f "tokens=3" %%a in (
+		%CPUTempPath%\temp\ParsedTemp.tmp
+		) do (
+			set "ParsedTemp=%%a"
+		)
+	)
+	if %ParsedTemp% gtr 0 echo [%time%] [Note] Last CPU Temp: %ParsedTemp%C > %CPUTempPath%\temp\LastTemp.tmp
+	del %CPUTempPath%\temp\OHMR.tmp && del %CPUTempPath%\temp\ParsedTemp.tmp
