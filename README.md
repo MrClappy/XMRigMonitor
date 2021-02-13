@@ -56,9 +56,9 @@ Setting            | Description             | Options
 PulseTime		| How often XMRigMonitor checks on XMRig  | Seconds
 CPUMonitor		| Adds a CPU Temperature check every PulseTime | Enabled / Disabled
 ScheduledTask		| Creates a task to run on boot and idle state  | Enabled / Disabled
-EmailOnXMRigCrash | Sends an email when XMRig crashes | True / False
+EmailOnXMRigCrash | Sends an email when XMRig crashes | Enabled / Disabled
 EmailOnXMRigCrashSubject  | Subject line of the email when XMRig crashes | Text string in quotes
-EmailOnSystemCrash  | Sends an email when the system crashes  | True / False
+EmailOnSystemCrash  | Sends an email when the system crashes  | Enabled / Disabled
 EmailOnSystemCrashSubject | Subject line of the email when the system crashes | Text string in quotes
 EmailOnTangoDownSubject | Subject line of the email when Tango disconnects | Text string in quotes
 EmailAccount  | Email address used to send emails | Email address
