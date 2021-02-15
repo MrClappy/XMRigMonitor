@@ -66,18 +66,19 @@ goto :STARTUP
 	)
 
 	:: Check if program was run by User or Scheduled Task
-	if not %username% == %Caller% (
-		set Caller=User
-		if "%ScheduledTaskChange%"=="" (
-			echo [%time%] [Note] Script Started Manually >> %DailyLog%
-		) else (
-			set Caller=Task
+	if %username% == %Caller% (
+		set Caller=Task
+		if defined ScheduledTaskChange (
 			echo %ScheduledTaskChange% >> %DailyLog%
 		)
-	) else (
 		goto SYSTEM_CRASH
+	) else (
+		set Caller=User
+		echo [%time%] [Note] Script Started Manually >> %DailyLog%
+		if defined ScheduledTaskChange (
+			echo %ScheduledTaskChange% >> %DailyLog%
 		)
-	)
+	) 
 
 	:: Check if XMRig was already running
 	for /F %%x in (
@@ -132,7 +133,7 @@ goto :STARTUP
 	:: Display statistics in CMD window every PulseTime seconds
 	cls && echo.
 	echo  [%TIME:~0,2%:%TIME:~3,2%:%TIME:~6,2%] XMRig Running (Checking every %PulseTime%seconds)
-	if "%CrashOccurred%" == "True" (
+	if %CrashOccurred% == True (
 		mode 58,5 && cls && echo.
 		echo  [%TIME:~0,2%:%TIME:~3,2%:%TIME:~6,2%] XMRig Running (Checking every %PulseTime%seconds) && echo  Today: System Crashes = [%SystemCrashInt%] XMRig Crashes = [%XMRigCrashInt%]
 	)
