@@ -12,6 +12,7 @@ maintain XMRig uptime on unstable systems and provide event logs when optimizing
 - Monitors CPU temperature metrics to correlate crash root cause
 - Displays daily crash statistics
 - Scheduled Task Mode: Runs silently on boot & restarts XMRigMonitor in the event of system crash
+- Tango Mode: Links two miners together to monitor each other
 
 ### Current State:
 
