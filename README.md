@@ -7,11 +7,11 @@ maintain XMRig uptime on unstable systems and provide event logs when optimizing
 
 ### Primary features:
 
-- Restarts XMRig executable in the event of an application crash or system crash
+- Restarts XMRig executable in the event of an application crash
 - Sends email notifications containing detailed logs of events
 - Monitors CPU temperature metrics to correlate crash root cause
-- User Mode = Displays daily crash statistics
-- Scheduled Task Mode = Runs silently on boot or when computer is idle
+- Displays daily crash statistics
+- Scheduled Task Mode: Runs silently on boot & restarts XMRigMonitor in the event of system crash
 
 ### Current State:
 
@@ -69,8 +69,3 @@ SMTPPortNumber  | SMTP port number used to send emails  | Port number
 EmailRecipient  | Email address to receive emails | Email address
 TangoMode | Adds a connectivity check for a second miner | Enabled / Disabled
 MinerName | Sets the Tango Mode computer name to check | Computer Name
-
-
-### Known Issues
-
-- Scheduled Tasks have zero user-configurable parameters, adjustments must be made manually in Task Scheduler
