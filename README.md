@@ -4,7 +4,7 @@
 
 XMRig Monitor is an automated watchdog for XMRig in Windows 10 environments. Its primary purpose is to maintain XMRig uptime on unstable systems and provide event logs when troubleshooting hardware optimization.
 
-### Primary features:
+### Features:
 
 - Restarts XMRig executable in the event of an application crash
 - Sends email notifications containing detailed logs of events
