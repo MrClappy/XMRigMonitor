@@ -1,6 +1,6 @@
 # XMRig Monitor
 
-## Project Description & Current State
+## Project Description
 
 XMRig Monitor is a personal project intended to serve as an automated watchdog for XMRig in Windows 10 environments. Its primary purpose is to
 maintain XMRig uptime on unstable systems and provide event logs when optimizing hardware for mining.
