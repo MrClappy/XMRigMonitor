@@ -1,7 +1,7 @@
 @echo off
 setlocal EnableExtensions EnableDelayedExpansion
 title XMRigMonitor 0.2b
-mode 60,3
+mode 56,3
 
 :: XMRigMonitor 0.2b (https://github.com/MrClappy/XMRigMonitor)
 :: Ryan MacNeille 2021
@@ -38,24 +38,39 @@ goto :STARTUP
 	set XMRigCrashCount=%CPUTempPath%\temp\XMRigCrashCount_%CurrentDate%.txt
 	set SystemCrashCount=%CPUTempPath%\temp\SystemCrashCount_%CurrentDate%.txt
 
+	:: Make sure the program is next to XMRig.exe
+	if not exist %WorkingDir%\%EXE% (
+		mode 70,9
+		cls && echo.
+		echo  [Error]
+		echo.
+		echo  XMRig.exe not found in folder: %WorkingDir%
+		echo.
+		echo  Please unzip XMRigMonitor into the folder containing XMRig.exe
+		echo.
+		echo  Press any key to exit...
+		pause > nul
+		exit
+	)
+
 	:: Check Scheduled Task Status
-	if %ScheduledTask% == Enabled (
-		for /f "delims=" %%i in ('type "%XMLFile%" ^& break ^> "%XMLFile%" ') do (
+	if %ScheduledTaskMode% == Enabled (
+		for /f "delims=" %%i in ('type "!XMLFile!" ^& break ^> "!XMLFile!" ') do (
 			set "line=%%i"
-			>>"%XMLFile%" echo(!line:XMRigVersion=%~f0!
+			>>"!XMLFile!" echo(!line:XMRigVersion=%~f0!
 		)
 		
 		schtasks /Query /TN "XMRigMonitor" > nul 2>&1  
 		if !errorlevel! == 0 (
 			schtasks /Delete /F /TN "XMRigMonitor" > nul 2>&1
-			schtasks /Create /TN XMRigMonitor /XML %XMLFile% > nul 2>&1
+			schtasks /Create /TN XMRigMonitor /XML !XMLFile! > nul 2>&1
 		) else (
-			schtasks /Create /TN XMRigMonitor /XML %XMLFile% > nul 2>&1
+			schtasks /Create /TN XMRigMonitor /XML !XMLFile! > nul 2>&1
 			set "ScheduledTaskChange=[%time%] [Note] Scheduled Task Enabled"
 		)
-		for /f "delims=" %%i in ('type "%XMLFile%" ^& break ^> "%XMLFile%" ') do (
+		for /f "delims=" %%i in ('type "!XMLFile!" ^& break ^> "!XMLFile!" ') do (
 			set "line=%%i"
-			>>"%XMLFile%" echo(!line:%~f0=XMRigVersion!
+			>>"!XMLFile!" echo(!line:%~f0=XMRigVersion!
 		)
 	) else (
 		schtasks /Query /TN "XMRigMonitor" > nul 2>&1
@@ -132,10 +147,10 @@ goto :STARTUP
 	
 	:: Display statistics in CMD window every PulseTime seconds
 	cls && echo.
-	echo  [%TIME:~0,2%:%TIME:~3,2%:%TIME:~6,2%] XMRig Running (Checking every %PulseTime%seconds)
+	echo  [%TIME:~0,2%:%TIME:~3,2%:%TIME:~6,2%] XMRig Running - Checking every %PulseTime%seconds
 	if "%CrashOccurred%" == "True" (
-		mode 58,5 && cls && echo.
-		echo  [%TIME:~0,2%:%TIME:~3,2%:%TIME:~6,2%] XMRig Running (Checking every %PulseTime%seconds) && echo  Today: System Crashes = [%SystemCrashInt%] XMRig Crashes = [%XMRigCrashInt%]
+		mode 54,5 && cls && echo.
+		echo  [%TIME:~0,2%:%TIME:~3,2%:%TIME:~6,2%] XMRig Running - Checking every %PulseTime%seconds && echo   Today: System Crashes = [%SystemCrashInt%]   XMRig Crashes = [%XMRigCrashInt%]
 	)
 	goto FEATURE_CHECK
 	
