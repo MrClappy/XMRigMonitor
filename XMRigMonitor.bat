@@ -133,7 +133,7 @@ goto :STARTUP
 	:: Display statistics in CMD window every PulseTime seconds
 	cls && echo.
 	echo  [%TIME:~0,2%:%TIME:~3,2%:%TIME:~6,2%] XMRig Running (Checking every %PulseTime%seconds)
-	if %CrashOccurred% == True (
+	if "%CrashOccurred%" == "True" (
 		mode 58,5 && cls && echo.
 		echo  [%TIME:~0,2%:%TIME:~3,2%:%TIME:~6,2%] XMRig Running (Checking every %PulseTime%seconds) && echo  Today: System Crashes = [%SystemCrashInt%] XMRig Crashes = [%XMRigCrashInt%]
 	)
