@@ -53,7 +53,7 @@ Setting            | Description             | Options
 --------------- | ----------------- | ------------------------------
 PulseTime		| How often XMRigMonitor checks on XMRig  | Seconds
 CPUMonitor		| Adds a CPU Temperature check every PulseTime | Enabled / Disabled
-ScheduledTaskMode		| Creates a task to run on boot (required for system crash email) | Enabled / Disabled
+ScheduledTaskMode		| Creates a task to run on boot (required for system email) | Enabled / Disabled
 EmailOnXMRigCrash | Sends an email when XMRig crashes | Enabled / Disabled
 EmailOnXMRigCrashSubject  | Subject line of the email when XMRig crashes | Text string in quotes
 EmailOnSystemCrash  | Sends an email when the system crashes  | Enabled / Disabled
