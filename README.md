@@ -68,7 +68,7 @@ EmailRecipient  | Email address to receive emails | Email address
 TangoMode | Adds a connectivity check for a second miner | Enabled / Disabled
 MinerName | Sets the Tango Mode computer name to check | Computer Name
 
-### Donations
+## Donations
 
 If you find this tool helpful, donations are greatly appreciated!
 
