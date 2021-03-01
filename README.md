@@ -52,7 +52,7 @@ XMRigMonitor.bat as administrator.
 Setting            | Description             | Options
 --------------- | ----------------- | ------------------------------
 PulseTime		| How often XMRigMonitor checks on XMRig  | Seconds
-TaskMode		| Runs XMRigMonitor silently on boot as Scheduled Task | Enabled / Disabled
+TaskMode		| Runs silently on boot as Scheduled Task | Enabled / Disabled
 ProxyMode		| Configures XMRigMonitor to monitor XMRig Proxy  | Enabled / Disabled
 CPUMonitor		| Adds a CPU Temperature check every PulseTime | Enabled / Disabled
 EXEOverride		| Allows the user to specify a different miner executable | Name.exe / Disabled
