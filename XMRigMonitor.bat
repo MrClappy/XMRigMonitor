@@ -27,7 +27,6 @@ goto :STARTUP
 :STARTUP
 	:: Set global variables
 	cd %~dp0
-	set EXE=xmrig.exe
 	set WorkingDir=%cd%
 	set /a TooFastCrashInt=0
 	set "Caller=%computername%$"
@@ -38,15 +37,29 @@ goto :STARTUP
 	set XMRigCrashCount=%CPUTempPath%\temp\XMRigCrashCount_%CurrentDate%.txt
 	set SystemCrashCount=%CPUTempPath%\temp\SystemCrashCount_%CurrentDate%.txt
 
-	:: Make sure the program is next to XMRig.exe
+	:: Make sure XMRigMonitor is next to executable
+	if /I not %EXEOverride% == Disabled (
+		set EXE=%EXEOverride%
+		set EXEName=%EXEOverride%
+	) else (
+		if %ProxyMode% == Enabled (
+			set EXE=xmrig-proxy.exe
+			set EXEName=Proxy
+			title "(Proxy) XMRigMonitor 0.2b"
+		) else (
+			set EXE=xmrig.exe
+			set EXEName=XMRig
+		)
+	)
+	
 	if not exist %WorkingDir%\%EXE% (
 		mode 70,9
 		cls && echo.
 		echo  [Error]
 		echo.
-		echo  XMRig.exe not found in folder: %WorkingDir%
+		echo  %EXEName% not found in folder: %WorkingDir%
 		echo.
-		echo  Please unzip XMRigMonitor into the folder containing XMRig.exe
+		echo  Please unzip XMRigMonitor into the folder containing %EXEName%
 		echo.
 		echo  Press any key to exit...
 		pause > nul
@@ -54,18 +67,18 @@ goto :STARTUP
 	)
 
 	:: Check Scheduled Task Status
-	if %ScheduledTaskMode% == Enabled (
+	if %TaskMode% == Enabled (
 		for /f "delims=" %%i in ('type "!XMLFile!" ^& break ^> "!XMLFile!" ') do (
 			set "line=%%i"
 			>>"!XMLFile!" echo(!line:XMRigVersion=%~f0!
 		)
 		
-		schtasks /Query /TN "XMRigMonitor" > nul 2>&1  
+		schtasks /Query /TN "XMRigMonitor (%EXEName%)" > nul 2>&1  
 		if !errorlevel! == 0 (
-			schtasks /Delete /F /TN "XMRigMonitor" > nul 2>&1
-			schtasks /Create /TN XMRigMonitor /XML !XMLFile! > nul 2>&1
+			schtasks /Delete /F /TN "XMRigMonitor (%EXEName%)" > nul 2>&1
+			schtasks /Create /TN "XMRigMonitor (%EXEName%)" /XML !XMLFile! > nul 2>&1
 		) else (
-			schtasks /Create /TN XMRigMonitor /XML !XMLFile! > nul 2>&1
+			schtasks /Create /TN "XMRigMonitor (%EXEName%)" /XML !XMLFile! > nul 2>&1
 			set "ScheduledTaskChange=[%time%] [Note] Scheduled Task Enabled"
 		)
 		for /f "delims=" %%i in ('type "!XMLFile!" ^& break ^> "!XMLFile!" ') do (
@@ -73,9 +86,9 @@ goto :STARTUP
 			>>"!XMLFile!" echo(!line:%~f0=XMRigVersion!
 		)
 	) else (
-		schtasks /Query /TN "XMRigMonitor" > nul 2>&1
+		schtasks /Query /TN "XMRigMonitor (%EXEName%)" > nul 2>&1
 		if !errorlevel! == 0 (
-			schtasks /Delete /F /TN "XMRigMonitor" > nul 2>&1
+			schtasks /Delete /F /TN "XMRigMonitor (%EXEName%)" > nul 2>&1
 			set "ScheduledTaskChange=[%time%] [Note] Scheduled Task Disabled"
 		)
 	)
@@ -89,7 +102,7 @@ goto :STARTUP
 		goto SYSTEM_CRASH
 	) else (
 		set Caller=User
-		echo [%time%] [Note] Script Started Manually >> %DailyLog%
+		echo [%time%] [Note] XMRigMonitor Started Manually >> %DailyLog%
 		if defined ScheduledTaskChange (
 			echo %ScheduledTaskChange% >> %DailyLog%
 		)
@@ -100,13 +113,13 @@ goto :STARTUP
 		'tasklist /NH /FI "IMAGENAME eq %EXE%"'
 		) do ( 
 			if %%x == %EXE% (
-				echo [%time%] [Note] XMRig already running, script monitoring... >> %DailyLog% && goto PULSE
+				echo [%time%] [Note] %EXEName% already running, script monitoring... >> %DailyLog% && goto PULSE
 			)
 	)
 	
 	:: Start XMRig if it's not running
 	start /MIN %WorkingDir%\%EXE%
-	echo [%time%] [Note] Initial XMRig Triggered, script monitoring... >> %DailyLog%
+	echo [%time%] [Note] Initial %EXEName% Triggered, script monitoring... >> %DailyLog%
 
 :PULSE
 	:: Recurring loop to check if XMRig is still running
@@ -147,10 +160,10 @@ goto :STARTUP
 	
 	:: Display statistics in CMD window every PulseTime seconds
 	cls && echo.
-	echo  [%TIME:~0,2%:%TIME:~3,2%:%TIME:~6,2%] XMRig Running - Checking every %PulseTime%seconds
+	echo  [%TIME:~0,2%:%TIME:~3,2%:%TIME:~6,2%] %EXEName% Running - Checking every %PulseTime%seconds
 	if "%CrashOccurred%" == "True" (
 		mode 54,5 && cls && echo.
-		echo  [%TIME:~0,2%:%TIME:~3,2%:%TIME:~6,2%] XMRig Running - Checking every %PulseTime%seconds && echo   Today: System Crashes = [%SystemCrashInt%]   XMRig Crashes = [%XMRigCrashInt%]
+		echo  [%TIME:~0,2%:%TIME:~3,2%:%TIME:~6,2%] %EXEName% Running - Checking every %PulseTime%seconds && echo   Today: System Crashes = [%SystemCrashInt%]   XMRig Crashes = [%XMRigCrashInt%]
 	)
 	goto FEATURE_CHECK
 	
@@ -182,7 +195,7 @@ goto :STARTUP
 		if %ss:~1% lss 5 (
 		set /a TooFastCrashInt=%TooFastCrashInt%+1
 			if %TooFastCrashInt% geq 10 (
-				echo [%time%] [ Er ] XMRig is crashing too frequently. Exiting. >>%DailyLog%
+				echo [%time%] [ Er ] %EXEName% is crashing too frequently - Exiting >>%DailyLog%
 				exit
 			)
 		)
@@ -207,7 +220,7 @@ goto :STARTUP
 		>%XMRigCrashCount% echo %XMRigCrashInt%
 	)
 	call %WorkingDir%\backend\LogCleaner.bat %DailyLog%
-	echo [%time%] [Warn] XMRig Crash Recovered %XMRigCrashInt% times, script monitoring... >> %DailyLog%
+	echo [%time%] [Warn] %EXEName% Crash Recovered %XMRigCrashInt% times, script monitoring... >> %DailyLog%
 	
 	if %CPUMonitor% == Enabled (
 		type %CPUTempPath%\temp\LastTemp.tmp >> %DailyLog%
@@ -242,9 +255,9 @@ goto :STARTUP
 
 :SYSTEM_CRASH_RECOVERY
 	::Check to see if the system has internet connectivity and restart XMRig once confirmed
+
 	ping -n 2 8.8.8.8 | find "TTL=" >nul 2>&1
 	if !errorlevel! equ 1 (
-		echo First Ping Failed >> %DailyLog%   
 		ping -n 6 8.8.8.8 | find "TTL=" >nul 2>&1
 		if !errorlevel! equ 1 (
 			set /a NetAttempt=%NetAttempt%+1
@@ -276,7 +289,7 @@ goto :STARTUP
 
 :SUCCESS
 	:: After a system crash has been recovered, email the user (if configured) and continue monitoring
-	echo [%time%] [Note] XMRig Running, script monitoring... >> %DailyLog%
+	echo [%time%] [Note] %EXEName% Running, script monitoring... >> %DailyLog%
 	if %CPUMonitor% == Enabled (
 		type %CPUTempPath%\temp\LastTemp.tmp >> %DailyLog%
 	)
