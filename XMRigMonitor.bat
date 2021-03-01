@@ -237,31 +237,40 @@ goto :STARTUP
 	)
 	call %WorkingDir%\backend\LogCleaner.bat %DailyLog% >nul
 	echo [%time%] [Warn] System Crashed %SystemCrashInt% times, checking network... >> %DailyLog%
+	set /a NetAttempt=0 
 	goto SYSTEM_CRASH_RECOVERY
 
 :SYSTEM_CRASH_RECOVERY
 	::Check to see if the system has internet connectivity and restart XMRig once confirmed
-	ping -n 1 192.168.1.1 | find "TTL=" > nul
-	if errorlevel 1 (
-		timeout /t 5 > nul
-		ping -n 1 192.168.1.1 | find "TTL=" > nul
-		if errorlevel 1 (
-			echo [%time%] [Warn] Network Still Down... >> %DailyLog%    
-			goto SYSTEM_CRASH_RECOVERY
-		) else (goto SYSTEM_CRASH_RECOVERY)
-	) else (
-		echo [%time%] [Note] Network Recovered >> %DailyLog%
-		for /F %%x in (
-			'tasklist /NH /FI "IMAGENAME eq %EXE%"'
-			) do (
-				if %%x == %EXE% goto PULSE
-				)
-		start /MIN %WorkingDir%\%EXE%
-		for /F %%x in (
-			'tasklist /NH /FI "IMAGENAME eq %EXE%"'
-			) do (
-				if %%x == %EXE% goto SUCCESS
+	ping -n 2 8.8.8.8 | find "TTL=" >nul 2>&1
+	if !errorlevel! equ 1 (
+		echo First Ping Failed >> %DailyLog%   
+		ping -n 6 8.8.8.8 | find "TTL=" >nul 2>&1
+		if !errorlevel! equ 1 (
+			set /a NetAttempt=%NetAttempt%+1
+			if !NetAttempt! geq 5 (
+				echo [%time%] [Warn] Network Still Down... >> %DailyLog%   
+				set /a NetAttempt=0
+				goto SYSTEM_CRASH_RECOVERY
+			) else (
+				goto SYSTEM_CRASH_RECOVERY
 			)
+		) else (
+			if !NetAttempt! geq 5 (
+				echo [%time%] [Note] Network Recovered >> %DailyLog%
+			)
+		)
+	) 
+	for /F %%x in (
+		'tasklist /NH /FI "IMAGENAME eq %EXE%"'
+		) do (
+			if %%x == %EXE% goto PULSE
+			)
+	start /MIN %WorkingDir%\%EXE%
+	for /F %%x in (
+		'tasklist /NH /FI "IMAGENAME eq %EXE%"'
+		) do (
+			if %%x == %EXE% goto SUCCESS
 		)
 	)	
 
