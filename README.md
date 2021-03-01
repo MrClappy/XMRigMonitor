@@ -55,7 +55,7 @@ PulseTime		| How often XMRigMonitor checks on XMRig  | Seconds
 TaskMode		| Runs XMRigMonitor silently on boot as Scheduled Task | Enabled / Disabled
 ProxyMode		| Configures XMRigMonitor to monitor XMRig Proxy  | Enabled / Disabled
 CPUMonitor		| Adds a CPU Temperature check every PulseTime | Enabled / Disabled
-EXEOverride		| Allows the user to specify a different miner executable | ExeName.exe / Disabled
+EXEOverride		| Allows the user to specify a different miner executable | Name.exe / Disabled
 EmailOnXMRigCrash | Sends an email when XMRig crashes | Enabled / Disabled
 EmailOnXMRigCrashSubject  | Subject line of the email when XMRig crashes | Text string in quotes
 EmailOnSystemCrash  | Sends an email when the system crashes  | Enabled / Disabled
