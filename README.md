@@ -24,9 +24,9 @@ The project currently exists as a set of Batch and Powershell scripts along with
 Name            | Description
 --------------- | -------------------------------------------------
 backend/		| Contains all supporting scripts and executables
-backend/OHMR		| Executables for CPU temperature monitoring
-backend/OHMR/temp		| Temporary files for CPU temperature parsing & crash counters
-logs		| Rotating logs of daily events
+backend/OHMR/		| Executables for CPU temperature monitoring
+backend/OHMR/temp/		| Temporary files for parsing & crash counters
+logs/		| Rotating logs of daily events
 
 
 ### Particular files:
@@ -52,8 +52,10 @@ XMRigMonitor.bat as administrator.
 Setting            | Description             | Options
 --------------- | ----------------- | ------------------------------
 PulseTime		| How often XMRigMonitor checks on XMRig  | Seconds
+TaskMode		| Runs XMRigMonitor silently on boot as Scheduled Task | Enabled / Disabled
+ProxyMode		| Configures XMRigMonitor to monitor XMRig Proxy  | Enabled / Disabled
 CPUMonitor		| Adds a CPU Temperature check every PulseTime | Enabled / Disabled
-ScheduledTaskMode		| Creates a task to run XMRigMonitor silently on boot | Enabled / Disabled
+EXEOverride		| Allows the user to specify a different miner executable | ExeName.exe / Disabled
 EmailOnXMRigCrash | Sends an email when XMRig crashes | Enabled / Disabled
 EmailOnXMRigCrashSubject  | Subject line of the email when XMRig crashes | Text string in quotes
 EmailOnSystemCrash  | Sends an email when the system crashes  | Enabled / Disabled
