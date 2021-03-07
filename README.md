@@ -1,6 +1,10 @@
 # XMRig Monitor
 
-![Imgur Image](https://i.imgur.com/jBslera.jpg)
+
+<p align="center" width="100%">
+    <img width="33%" src="https://i.imgur.com/jBslera.jpg"> 
+</p>
+
 
 ## Project Description
 
