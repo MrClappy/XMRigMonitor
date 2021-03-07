@@ -1,14 +1,12 @@
 # XMRig Monitor
 
+## Project Description
+
+XMRig Monitor is an automated watchdog for XMRig crypto miners or proxies in Windows 10 environments. Its primary purpose is to maintain uptime on unstable systems and provide event logs when troubleshooting hardware optimization.
 
 <p align="center" width="100%">
     <img width="60%" src="https://i.imgur.com/jBslera.jpg"> 
 </p>
-
-
-## Project Description
-
-XMRig Monitor is an automated watchdog for XMRig crypto miners or proxies in Windows 10 environments. Its primary purpose is to maintain uptime on unstable systems and provide event logs when troubleshooting hardware optimization.
 
 ### Main Features:
 
