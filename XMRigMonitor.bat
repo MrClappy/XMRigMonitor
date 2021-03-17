@@ -159,11 +159,30 @@ goto :STARTUP
 	if %SystemCrashInt% gtr 0 set CrashOccured=True	
 	
 	:: Display statistics in CMD window every PulseTime seconds
-	cls && echo.
-	echo  [%TIME:~0,2%:%TIME:~3,2%:%TIME:~6,2%] %EXEName% Running - Checking every %PulseTime%seconds
+	if %CPUMonitor% == Enabled (
+		if "%CPUTemp%" == "" (
+			cls && echo.
+			echo  [%TIME:~0,2%:%TIME:~3,2%:%TIME:~6,2%] %EXEName% Running - Checking every %PulseTime%seconds
+		) else (
+			mode 60,3 && cls && echo.
+			echo  [%TIME:~0,2%:%TIME:~3,2%:%TIME:~6,2%] %EXEName% Running [%CPUTemp%C] - Checking every %PulseTime%seconds
+		)
+	) else (
+		echo  [%TIME:~0,2%:%TIME:~3,2%:%TIME:~6,2%] %EXEName% Running - Checking every %PulseTime%seconds
+	)
 	if "%CrashOccurred%" == "True" (
-		mode 54,5 && cls && echo.
-		echo  [%TIME:~0,2%:%TIME:~3,2%:%TIME:~6,2%] %EXEName% Running - Checking every %PulseTime%seconds && echo   Today: System Crashes = [%SystemCrashInt%]   XMRig Crashes = [%XMRigCrashInt%]
+		if %CPUMonitor% == Enabled (
+			if "%CPUTemp%" == "" (
+				mode 54,5 && cls && echo.
+				echo  [%TIME:~0,2%:%TIME:~3,2%:%TIME:~6,2%] %EXEName% Running - Checking every %PulseTime%seconds && echo   Today: System Crashes = [%SystemCrashInt%]   XMRig Crashes = [%XMRigCrashInt%]
+			) else (
+				mode 60,5 && cls && echo.
+				echo  [%TIME:~0,2%:%TIME:~3,2%:%TIME:~6,2%] %EXEName% Running [%CPUTemp%C] - Checking every %PulseTime%seconds && echo   Today: System Crashes = [%SystemCrashInt%]   XMRig Crashes = [%XMRigCrashInt%]
+			)
+		) else (
+			mode 54,5 && cls && echo.
+			echo  [%TIME:~0,2%:%TIME:~3,2%:%TIME:~6,2%] %EXEName% Running - Checking every %PulseTime%seconds && echo   Today: System Crashes = [%SystemCrashInt%]   XMRig Crashes = [%XMRigCrashInt%]
+		)
 	)
 	goto FEATURE_CHECK
 	
@@ -345,5 +364,12 @@ goto :STARTUP
 			set "ParsedTemp=%%a"
 		)
 	)
-	if %ParsedTemp% gtr 0 echo [%time%] [Note] Last CPU Temp: %ParsedTemp%C > %CPUTempPath%\temp\LastTemp.tmp
+	call :ROUND %ParsedTemp% CPUTemp
+	if %CPUTemp% gtr 0 echo [%time%] [Note] Last CPU Temp: %CPUTemp%C > %CPUTempPath%\temp\LastTemp.tmp
 	del %CPUTempPath%\temp\OHMR.tmp && del %CPUTempPath%\temp\ParsedTemp.tmp
+	
+:ROUND <Input> <Output>
+	for /f "tokens=1,2 delims=." %%A in ("%~1") do set "X=%%~A" & set "Y=%%~B0"
+	if %Y:~0,1% geq 5 set /a "X+=1"
+	set "%~2=%X%" >nul 2>&1
+	exit /b 0
