@@ -1,15 +1,34 @@
 :: XMRigMonitor 0.2b (https://github.com/MrClappy/XMRigMonitor)
 :: Ryan MacNeille 2021
 
-@echo off
-mode 56,3
-setlocal EnableExtensions EnableDelayedExpansion
+	:: Set global parameters
+	@echo off
+	mode 56,3
+	title XMRigMonitor 0.2b
+	setlocal EnableExtensions EnableDelayedExpansion
 
-:: -- Load user-defined settings -- ::
-call :LOAD_CONFIG "%~dpn0"
-goto :STARTUP
+	:: Verify administrative permissions
+    net session >nul 2>&1
+    if %errorLevel% == 0 (
+		call :LOAD_CONFIG "%~dpn0"
+		goto :STARTUP
+    ) else (
+		mode 52,9
+		cls && echo.
+		echo  [Error]
+		echo.
+		echo  XMRigMonitor requires Administrative permissions
+		echo.
+		echo  Please re-run XMRigMonitor as Administrator
+		echo.
+		echo  Press any key to exit...
+		pause > nul
+		exit
+    )
 
 :LOAD_CONFIG
+
+	:: -- Load user-defined settings -- ::
 	echo  Loading Configuration...
 	set ConfigFile=%1
 	set ConfigFile=%ConfigFile:"=%
@@ -25,6 +44,7 @@ goto :STARTUP
 	:: -- Begin Program -- ::
 	
 :STARTUP
+
 	:: Set global variables
 	cd %~dp0
 	set WorkingDir=%cd%
@@ -139,6 +159,7 @@ goto :STARTUP
 	echo [%time%] [Note] Initial %EXEName% Triggered, script monitoring... >> %DailyLog%
 
 :PULSE
+
 	:: Recurring loop to check if XMRig is still running
 	for /F %%x in (
 		'tasklist /NH /FI "IMAGENAME eq %EXE%"'
@@ -161,6 +182,7 @@ goto :STARTUP
 	goto PULSE
 
 :STATS
+
 	:: Get daily statistics if program was run by user
 	if not exist %XMRigCrashCount% (
 		del /F /Q %CPUTempPath%\temp\XMRigCrashCount_*.txt 2>nul
@@ -204,6 +226,7 @@ goto :STARTUP
 	goto FEATURE_CHECK
 	
 :FEATURE_CHECK
+
 	:: Check and run any enabled feature
 	if %CPUMonitor% == Enabled (
 		set /a AdjustedPulseTime=%PulseTime%-5
@@ -220,6 +243,7 @@ goto :STARTUP
 	
 	
 :XMRIG_CRASH
+
 	:: Check to see if XMRig is crashing immediately, this can occur if the executable is corrupt
 	set "endTime=%time: =0%"
 	set "end=!endTime:%time:~8,1%=%%100)*100+1!"  &  set "start=!startTime:%time:~8,1%=%%100)*100+1!"
@@ -240,6 +264,7 @@ goto :STARTUP
 
 	
 :XMRIG_RECOVERY
+
 	:: When XMRig crashes, update the daily crash count and email the user (if configured)
 	set CurrentDate=%DATE:~10,4%%DATE:~4,2%%DATE:~7,2%
 	if not exist %XMRigCrashCount% (
@@ -268,6 +293,7 @@ goto :STARTUP
 	goto PULSE
 
 :SYSTEM_CRASH
+
 	:: When the system crashes, update the daily crash count and start the recovery process
 	set CurrentDate=%DATE:~10,4%%DATE:~4,2%%DATE:~7,2%
 	if not exist %SystemCrashCount% (
@@ -290,6 +316,7 @@ goto :STARTUP
 	goto SYSTEM_CRASH_RECOVERY
 
 :SYSTEM_CRASH_RECOVERY
+
 	::Check to see if the system has internet connectivity and restart XMRig once confirmed
 
 	ping -n 2 8.8.8.8 | find "TTL=" >nul 2>&1
@@ -324,6 +351,7 @@ goto :STARTUP
 	)	
 
 :SUCCESS
+
 	:: After a system crash has been recovered, email the user (if configured) and continue monitoring
 	echo [%time%] [Note] %EXEName% Running, script monitoring... >> %DailyLog%
 	if %CPUMonitor% == Enabled (
@@ -355,6 +383,7 @@ goto :STARTUP
 	goto PULSE
 	
 :CPU_TEMP
+
 	:: As long as XMRig is running, get CPU temperature every PulseTime seconds	
 	start /WAIT /B %CPUTempPath%\OpenHardwareMonitorReport.exe ReportToFile -f %CPUTempPath%\temp\OHMR.tmp
 	
@@ -386,6 +415,7 @@ goto :STARTUP
 	del %CPUTempPath%\temp\OHMR.tmp && del %CPUTempPath%\temp\ParsedTemp.tmp
 	
 :ROUND <Input> <Output>
+
 	for /f "tokens=1,2 delims=." %%A in ("%~1") do set "X=%%~A" & set "Y=%%~B0"
 	if %Y:~0,1% geq 5 set /a "X+=1"
 	set "%~2=%X%" >nul 2>&1
