@@ -1,10 +1,9 @@
-@echo off
-setlocal EnableExtensions EnableDelayedExpansion
-title XMRigMonitor 0.2b
-mode 56,3
-
 :: XMRigMonitor 0.2b (https://github.com/MrClappy/XMRigMonitor)
 :: Ryan MacNeille 2021
+
+@echo off
+mode 56,3
+setlocal EnableExtensions EnableDelayedExpansion
 
 :: -- Load user-defined settings -- ::
 call :LOAD_CONFIG "%~dpn0"
@@ -14,7 +13,7 @@ goto :STARTUP
 	echo  Loading Configuration...
 	set ConfigFile=%1
 	set ConfigFile=%ConfigFile:"=%
-
+	
 	for %%c in (
 		"!ConfigFile!.conf"
 	) do (
@@ -24,6 +23,7 @@ goto :STARTUP
 	)
 	
 	:: -- Begin Program -- ::
+	
 :STARTUP
 	:: Set global variables
 	cd %~dp0
@@ -36,8 +36,8 @@ goto :STARTUP
 	set DailyLog=%WorkingDir%\backend\logs\Script_Log_%CurrentDate%.txt
 	set XMRigCrashCount=%CPUTempPath%\temp\XMRigCrashCount_%CurrentDate%.txt
 	set SystemCrashCount=%CPUTempPath%\temp\SystemCrashCount_%CurrentDate%.txt
-
-	:: Make sure XMRigMonitor is next to executable
+	
+	:: Set EXE and make sure XMRigMonitor is next to it
 	if /I not %EXEOverride% == Disabled (
 		set EXE=%EXEOverride%
 		set EXEName=%EXEOverride%
@@ -45,7 +45,6 @@ goto :STARTUP
 		if %ProxyMode% == Enabled (
 			set EXE=xmrig-proxy.exe
 			set EXEName=Proxy
-			title "(Proxy) XMRigMonitor 0.2b"
 		) else (
 			set EXE=xmrig.exe
 			set EXEName=XMRig
@@ -65,6 +64,24 @@ goto :STARTUP
 		pause > nul
 		exit
 	)
+	
+	:: Make sure XMRigMonitor isn't already running for this EXE
+	tasklist /v|find "XMRigMonitor 0.2b (%EXEName%)" >nul &&set Lock=True || set Lock=False
+	if %Lock% == True (
+		echo [%time%] [ Er ] XMRigMonitor Triggered but Already Running >> %DailyLog%
+		mode 55,6
+		cls && echo.
+		echo  [Error]
+		echo.
+		echo  XMRigMonitor is already running for %EXEName%
+		echo.
+		echo  Press any key to exit...
+		pause > nul
+		exit
+	)
+	
+	:: Set Window Title
+	title XMRigMonitor 0.2b (%EXEName%)
 
 	:: Check Scheduled Task Status
 	if %TaskMode% == Enabled (
@@ -177,11 +194,11 @@ goto :STARTUP
 				echo  [%TIME:~0,2%:%TIME:~3,2%:%TIME:~6,2%] %EXEName% Running - Checking every %PulseTime%seconds && echo   Today: System Crashes = [%SystemCrashInt%]   XMRig Crashes = [%XMRigCrashInt%]
 			) else (
 				mode 60,5 && cls && echo.
-				echo  [%TIME:~0,2%:%TIME:~3,2%:%TIME:~6,2%] %EXEName% Running [%CPUTemp%C] - Checking every %PulseTime%seconds && echo   Today: System Crashes = [%SystemCrashInt%]   XMRig Crashes = [%XMRigCrashInt%]
+				echo  [%TIME:~0,2%:%TIME:~3,2%:%TIME:~6,2%] %EXEName% Running [%CPUTemp%C] - Checking every %PulseTime%seconds && echo     Today: System Crashes = [%SystemCrashInt%]     XMRig Crashes = [%XMRigCrashInt%]
 			)
 		) else (
 			mode 54,5 && cls && echo.
-			echo  [%TIME:~0,2%:%TIME:~3,2%:%TIME:~6,2%] %EXEName% Running - Checking every %PulseTime%seconds && echo   Today: System Crashes = [%SystemCrashInt%]   XMRig Crashes = [%XMRigCrashInt%]
+			echo  [%TIME:~0,2%:%TIME:~3,2%:%TIME:~6,2%] %EXEName% Running - Checking every %PulseTime%seconds && echo     Today: System Crashes = [%SystemCrashInt%]     XMRig Crashes = [%XMRigCrashInt%]
 		)
 	)
 	goto FEATURE_CHECK
