@@ -83,4 +83,4 @@ MinerName | Sets the Tango Mode computer name to check | Computer Name
 
 If you find this tool helpful, donations are greatly appreciated!
 
-XMR: 47zEuqnGse6LBQMF9hnRGxGn7bLgJQXzZThjqFMFsqb152PVmiPP5eXfK7vNPpQTX5W5BmAqqu6DeVdUrT7nG5NyMNxvMr2
+XMR: `47zEuqnGse6LBQMF9hnRGxGn7bLgJQXzZThjqFMFsqb152PVmiPP5eXfK7vNPpQTX5W5BmAqqu6DeVdUrT7nG5NyMNxvMr2`
