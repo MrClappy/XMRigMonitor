@@ -155,7 +155,7 @@
 	)
 	
 	:: Start XMRig if it's not running
-	start /MIN %WorkingDir%\%EXE%
+	start /MIN %WorkingDir%\%EXE% %EXEParameters%
 	echo [%time%] [Note] Initial %EXEName% Triggered, script monitoring... >> %DailyLog%
 
 :PULSE
@@ -173,7 +173,7 @@
 			)
 		)
 	)
-	start /MIN %WorkingDir%\%EXE%
+	start /MIN %WorkingDir%\%EXE% %EXEParameters%
 	for /F %%x in (
 		'tasklist /NH /FI "IMAGENAME eq %EXE%"'
 		) do (
@@ -213,14 +213,14 @@
 		if %CPUMonitor% == Enabled (
 			if "%CPUTemp%" == "" (
 				mode 54,5 && cls && echo.
-				echo  [%TIME:~0,2%:%TIME:~3,2%:%TIME:~6,2%] %EXEName% Running - Checking every %PulseTime%seconds && echo   Today: System Crashes = [%SystemCrashInt%]   XMRig Crashes = [%XMRigCrashInt%]
+				echo  [%TIME:~0,2%:%TIME:~3,2%:%TIME:~6,2%] %EXEName% Running - Checking every %PulseTime%seconds && echo   Today: System Crashes = [%SystemCrashInt%]   App Crashes = [%XMRigCrashInt%]
 			) else (
 				mode 60,5 && cls && echo.
-				echo  [%TIME:~0,2%:%TIME:~3,2%:%TIME:~6,2%] %EXEName% Running [%CPUTemp%C] - Checking every %PulseTime%seconds && echo     Today: System Crashes = [%SystemCrashInt%]     XMRig Crashes = [%XMRigCrashInt%]
+				echo  [%TIME:~0,2%:%TIME:~3,2%:%TIME:~6,2%] %EXEName% Running [%CPUTemp%C] - Checking every %PulseTime%seconds && echo     Today: System Crashes = [%SystemCrashInt%]     App Crashes = [%XMRigCrashInt%]
 			)
 		) else (
 			mode 54,5 && cls && echo.
-			echo  [%TIME:~0,2%:%TIME:~3,2%:%TIME:~6,2%] %EXEName% Running - Checking every %PulseTime%seconds && echo     Today: System Crashes = [%SystemCrashInt%]     XMRig Crashes = [%XMRigCrashInt%]
+			echo  [%TIME:~0,2%:%TIME:~3,2%:%TIME:~6,2%] %EXEName% Running - Checking every %PulseTime%seconds && echo     Today: System Crashes = [%SystemCrashInt%]     App Crashes = [%XMRigCrashInt%]
 		)
 	)
 	goto FEATURE_CHECK
@@ -265,7 +265,7 @@
 	
 :XMRIG_RECOVERY
 
-	:: When XMRig crashes, update the daily crash count and email the user (if configured)
+	:: When App Crashes, update the daily crash count and email the user (if configured)
 	set CurrentDate=%DATE:~10,4%%DATE:~4,2%%DATE:~7,2%
 	if not exist %XMRigCrashCount% (
 		del /F /Q %CPUTempPath%\temp\XMRigCrashCount_*.txt 2>nul 
@@ -342,7 +342,7 @@
 		) do (
 			if %%x == %EXE% goto PULSE
 			)
-	start /MIN %WorkingDir%\%EXE%
+	start /MIN %WorkingDir%\%EXE% %EXEParameters%
 	for /F %%x in (
 		'tasklist /NH /FI "IMAGENAME eq %EXE%"'
 		) do (
